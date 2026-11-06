@@ -1,0 +1,13 @@
+# Ket qua build
+Debug/
+Release/
+
+# Du lieu workspace
+.metadata/
+
+# Cau hinh debug ca nhan
+*.launch
+
+# Tep tam
+*.bak
+*.tmp
