@@ -12,13 +12,6 @@
    "type": "lcd1602"
   },
   {
-   "id": "rbl",
-   "type": "resistor",
-   "props": {
-    "value": 220
-   }
-  },
-  {
    "id": "btnMode",
    "type": "pushbutton"
   },
@@ -59,37 +52,17 @@
  ],
  "wires": [
   [
+   "soil.AOUT",
+   "board.PA0",
+   "green"
+  ],
+  [
    "soil.VCC",
    "board.3V3",
    "red"
   ],
   [
    "soil.GND",
-   "board.GND",
-   "black"
-  ],
-  [
-   "soil.AOUT",
-   "board.PA0",
-   "green"
-  ],
-  [
-   "lcd.VSS",
-   "board.GND",
-   "black"
-  ],
-  [
-   "lcd.VDD",
-   "board.5V",
-   "red"
-  ],
-  [
-   "lcd.V0",
-   "board.GND",
-   "black"
-  ],
-  [
-   "lcd.RW",
    "board.GND",
    "black"
   ],
@@ -124,18 +97,33 @@
    "blue"
   ],
   [
-   "lcd.A",
-   "rbl.1",
-   "red"
-  ],
-  [
-   "rbl.2",
+   "lcd.VDD",
    "board.5V",
    "red"
   ],
   [
-   "lcd.K",
+   "lcd.A",
+   "lcd.VDD",
+   "red"
+  ],
+  [
+   "lcd.VSS",
    "board.GND",
+   "black"
+  ],
+  [
+   "lcd.V0",
+   "lcd.VSS",
+   "black"
+  ],
+  [
+   "lcd.RW",
+   "lcd.VSS",
+   "black"
+  ],
+  [
+   "lcd.K",
+   "lcd.VSS",
    "black"
   ],
   [
@@ -144,19 +132,9 @@
    "green"
   ],
   [
-   "btnMode.2a",
-   "board.GNDb",
-   "black"
-  ],
-  [
    "btnUp.1a",
    "board.PB6",
    "green"
-  ],
-  [
-   "btnUp.2a",
-   "board.GNDb",
-   "black"
   ],
   [
    "btnDown.1a",
@@ -164,19 +142,34 @@
    "green"
   ],
   [
-   "btnDown.2a",
-   "board.GNDb",
-   "black"
-  ],
-  [
    "btnPump.1a",
    "board.PB8",
    "green"
   ],
   [
-   "btnPump.2a",
+   "btnMode.2a",
    "board.GNDb",
    "black"
+  ],
+  [
+   "btnUp.2a",
+   "btnMode.2b",
+   "black"
+  ],
+  [
+   "btnDown.2a",
+   "btnUp.2b",
+   "black"
+  ],
+  [
+   "btnPump.2a",
+   "btnDown.2b",
+   "black"
+  ],
+  [
+   "relay.IN",
+   "board.PA4",
+   "yellow"
   ],
   [
    "relay.VCC",
@@ -187,11 +180,6 @@
    "relay.GND",
    "board.GNDc",
    "black"
-  ],
-  [
-   "relay.IN",
-   "board.PA4",
-   "yellow"
   ],
   [
    "relay.COM",
@@ -210,7 +198,7 @@
   ],
   [
    "bat.V-",
-   "board.GNDc",
+   "relay.GND",
    "black"
   ],
   [
