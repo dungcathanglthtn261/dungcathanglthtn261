@@ -1,0 +1,7 @@
+flowchart TD
+  A([Task_Display<br/>chu kỳ 200 ms]) --> B[Khóa mutex, sao chép dữ liệu, mở mutex]
+  B --> C["Dòng 1: SOIL xx% SET yy%"]
+  C --> D["Dòng 2: AUTO/MAN  PUMP:ON/OFF"]
+  D --> E[Ghi 2 dòng lên LCD 16x2]
+  E --> F[vTaskDelayUntil 200 ms]
+  F --> B

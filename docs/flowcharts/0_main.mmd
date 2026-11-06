@@ -1,0 +1,8 @@
+flowchart TD
+  A([BẮT ĐẦU]) --> B[Khởi tạo HAL, xung nhịp hệ thống]
+  B --> C[Khởi tạo GPIO, ADC1, USART2, LCD 16x2]
+  C --> D[Tắt relay: bơm OFF<br/>Mode = AUTO, Setpoint = 60%]
+  D --> E[Tạo mutex bảo vệ dữ liệu dùng chung]
+  E --> F[Tạo 5 task:<br/>SensorRead, ButtonProcess,<br/>Control, Display, UART_Tx]
+  F --> G[vTaskStartScheduler]
+  G --> H([Bộ lập lịch FreeRTOS<br/>chạy các task])

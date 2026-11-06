@@ -1,0 +1,12 @@
+flowchart TD
+  A([Task_Control<br/>chu kỳ 100 ms]) --> B[Khóa mutex, đọc soil, setpoint, mode]
+  B --> C{Mode = AUTO?}
+  C -- Không: MANUAL --> G[Giữ trạng thái bơm<br/>do nút PUMP quyết định]
+  C -- Có --> D{soil &lt; setpoint?}
+  D -- Có --> E[Bật bơm:<br/>relay IN = LOW]
+  D -- Không --> F[Tắt bơm:<br/>relay IN = HIGH]
+  E --> H[Mở mutex]
+  F --> H
+  G --> H
+  H --> I[vTaskDelayUntil 100 ms]
+  I --> B

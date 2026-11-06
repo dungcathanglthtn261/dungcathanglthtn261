@@ -1,0 +1,16 @@
+flowchart TD
+  A([Task_ButtonProcess<br/>chu kỳ 20 ms]) --> B[Đọc 4 nút MODE, UP, DOWN, PUMP]
+  B --> C{Trạng thái ổn định<br/>3 lần quét liên tiếp?}
+  C -- Không --> Z
+  C -- Có, vừa nhấn --> D{Nút nào?}
+  D -- MODE --> E[Đổi AUTO ↔ MANUAL<br/>Tắt bơm] --> Z
+  D -- UP --> F{Setpoint &lt; 100?}
+  F -- Có --> F1[Setpoint + 1] --> Z
+  F -- Không --> Z
+  D -- DOWN --> G{Setpoint &gt; 0?}
+  G -- Có --> G1[Setpoint − 1] --> Z
+  G -- Không --> Z
+  D -- PUMP --> H{Mode = MANUAL?}
+  H -- Có --> H1[Đảo trạng thái bơm] --> Z
+  H -- Không --> Z
+  Z[vTaskDelayUntil 20 ms] --> B

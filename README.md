@@ -21,6 +21,9 @@ Nhóm: Dũng · Ca · Thắng
 docs/                Đề tài, yêu cầu chung, bảng phân công, sơ đồ khối
 hardware/kicad/      Project KiCad: schematic, PCB 10x10 cm, thư viện symbol/footprint riêng
 hardware/images/     Ảnh xem nhanh schematic và PCB
+firmware/            Code STM32 + FreeRTOS: app/ (task, logic), middleware/ (soil_sensor, lcd16x02, relay_pump)
+docs/test/           Kịch bản kiểm thử
+docs/flowcharts/     Lưu đồ giải thuật (mermaid + png)
 simulation/mokxi/    diagram.json (định dạng Wokwi) + sketch.ino để mô phỏng trên Mokxi/Wokwi
 ```
 

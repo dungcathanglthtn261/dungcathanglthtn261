@@ -1,0 +1,6 @@
+flowchart TD
+  A([Task_UART_Tx<br/>chu kỳ 1000 ms]) --> B[Khóa mutex, sao chép dữ liệu, mở mutex]
+  B --> C["Tạo chuỗi:<br/>SOIL: xx% | SET: yy% | MODE: AUTO | PUMP: ON"]
+  C --> D[Gửi chuỗi qua USART2 tới PC]
+  D --> E[vTaskDelayUntil 1000 ms]
+  E --> B

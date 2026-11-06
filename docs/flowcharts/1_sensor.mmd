@@ -1,0 +1,11 @@
+flowchart TD
+  A([Task_SensorRead<br/>chu kỳ 1000 ms]) --> B[Đọc ADC kênh PA0 8 lần]
+  B --> C[Tính trung bình raw]
+  C --> D["Quy đổi %:<br/>soil = (raw − ADC_DRY)·100 / (ADC_WET − ADC_DRY)"]
+  D --> E{soil &lt; 0?}
+  E -- Có --> F[soil = 0] --> I
+  E -- Không --> G{soil &gt; 100?}
+  G -- Có --> H[soil = 100] --> I
+  G -- Không --> I[Khóa mutex, ghi soil, mở mutex]
+  I --> J[vTaskDelayUntil 1000 ms]
+  J --> B
