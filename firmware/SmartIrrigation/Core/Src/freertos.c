@@ -52,6 +52,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+volatile uint32_t g_button_press_count[BUTTON_COUNT] = {0U};
 system_data_t g_system_data =
 {
     .soil_percent = 0U,
@@ -145,7 +146,7 @@ void MX_FREERTOS_Init(void) {
   displayTaskHandle = osThreadCreate(osThread(displayTask), NULL);
 
   /* definition and creation of uartTask */
-  osThreadDef(uartTask, StartuartTask, osPriorityNormal, 0, 128);
+  osThreadDef(uartTask, StartuartTask, osPriorityNormal, 0, 384);
   uartTaskHandle = osThreadCreate(osThread(uartTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -164,10 +165,21 @@ void MX_FREERTOS_Init(void) {
 void StartbuttonTask(void const * argument)
 {
   /* USER CODE BEGIN StartbuttonTask */
+	button_init();
   /* Infinite loop */
   for(;;)
   {
-    osDelay(20);
+    button_process();
+
+    for (uint32_t i = 0U; i < BUTTON_COUNT; i++)
+    {
+      if (button_take_press((button_id_t)i))
+      {
+        g_button_press_count[i]++;
+      }
+    }
+
+    osDelay(BUTTON_PERIOD_MS);
   }
   /* USER CODE END StartbuttonTask */
 }
@@ -237,9 +249,21 @@ void StartuartTask(void const * argument)
 {
   /* USER CODE BEGIN StartuartTask */
   /* Infinite loop */
-  for(;;)
+	system_data_t snapshot;
+
+	uart_comm_init();
+
+  for (;;)
   {
-    osDelay(1000);
+	if (osMutexWait(systemDataMutexHandle, osWaitForever) == osOK)
+	{
+	  snapshot = g_system_data;
+	  osMutexRelease(systemDataMutexHandle);
+
+	  uart_comm_send_status(&snapshot);
+	}
+
+	osDelay(UART_PERIOD_MS);
   }
   /* USER CODE END StartuartTask */
 }
