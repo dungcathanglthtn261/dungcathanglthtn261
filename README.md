@@ -56,6 +56,8 @@ Ubuntu không chạy được Proteus, nhóm dùng **Mokxi** (mô phỏng trên 
 - `simulation/mokxi/mokxi_project.json`: project định dạng Mokxi (`mokxi-ai/1`), đã qua
   `validate_project` của Mokxi, 0 lỗi. Dùng cảm biến độ ẩm điện dung, máy bơm mini chạy pin 4xAA
   qua relay kích mức thấp, diode chống dòng ngược. Serial Monitor in gói tin UART.
+- **Project Mokxi (layout gọn, chạy được):** https://app.mokxi.com/p/RN2hMLpKIqXbyVL_  
+  Vị trí/đường dây nằm trong `diagram_mokxi_native.json`; code Mokxi: `sketch_mokxi.ino`.
 - `simulation/mokxi/diagram.json` + `sketch.ino`: bản định dạng Wokwi (biến trở thay cảm biến,
   LED thay máy bơm).
 
