@@ -1,0 +1,228 @@
+{
+ "format": "mokxi-ai/1",
+ "name": "Smart Irrigation System - LTHTN",
+ "board": "bluepill",
+ "parts": [
+  {
+   "id": "soil",
+   "type": "soilmoisture"
+  },
+  {
+   "id": "lcd",
+   "type": "lcd1602"
+  },
+  {
+   "id": "rbl",
+   "type": "resistor",
+   "props": {
+    "value": 220
+   }
+  },
+  {
+   "id": "btnMode",
+   "type": "pushbutton"
+  },
+  {
+   "id": "btnUp",
+   "type": "pushbutton"
+  },
+  {
+   "id": "btnDown",
+   "type": "pushbutton"
+  },
+  {
+   "id": "btnPump",
+   "type": "pushbutton"
+  },
+  {
+   "id": "relay",
+   "type": "relay",
+   "props": {
+    "trigger": "low"
+   }
+  },
+  {
+   "id": "pump",
+   "type": "waterpump"
+  },
+  {
+   "id": "bat",
+   "type": "battery",
+   "props": {
+    "kind": "aa4"
+   }
+  },
+  {
+   "id": "d1",
+   "type": "diode"
+  }
+ ],
+ "wires": [
+  [
+   "soil.VCC",
+   "board.3V3",
+   "red"
+  ],
+  [
+   "soil.GND",
+   "board.GND",
+   "black"
+  ],
+  [
+   "soil.AOUT",
+   "board.PA0",
+   "green"
+  ],
+  [
+   "lcd.VSS",
+   "board.GND",
+   "black"
+  ],
+  [
+   "lcd.VDD",
+   "board.5V",
+   "red"
+  ],
+  [
+   "lcd.V0",
+   "board.GND",
+   "black"
+  ],
+  [
+   "lcd.RW",
+   "board.GND",
+   "black"
+  ],
+  [
+   "lcd.RS",
+   "board.PB0",
+   "yellow"
+  ],
+  [
+   "lcd.E",
+   "board.PB1",
+   "yellow"
+  ],
+  [
+   "lcd.D4",
+   "board.PB10",
+   "blue"
+  ],
+  [
+   "lcd.D5",
+   "board.PB11",
+   "blue"
+  ],
+  [
+   "lcd.D6",
+   "board.PB12",
+   "blue"
+  ],
+  [
+   "lcd.D7",
+   "board.PB13",
+   "blue"
+  ],
+  [
+   "lcd.A",
+   "rbl.1",
+   "red"
+  ],
+  [
+   "rbl.2",
+   "board.5V",
+   "red"
+  ],
+  [
+   "lcd.K",
+   "board.GND",
+   "black"
+  ],
+  [
+   "btnMode.1a",
+   "board.PB5",
+   "green"
+  ],
+  [
+   "btnMode.2a",
+   "board.GNDb",
+   "black"
+  ],
+  [
+   "btnUp.1a",
+   "board.PB6",
+   "green"
+  ],
+  [
+   "btnUp.2a",
+   "board.GNDb",
+   "black"
+  ],
+  [
+   "btnDown.1a",
+   "board.PB7",
+   "green"
+  ],
+  [
+   "btnDown.2a",
+   "board.GNDb",
+   "black"
+  ],
+  [
+   "btnPump.1a",
+   "board.PB8",
+   "green"
+  ],
+  [
+   "btnPump.2a",
+   "board.GNDb",
+   "black"
+  ],
+  [
+   "relay.VCC",
+   "board.5V",
+   "red"
+  ],
+  [
+   "relay.GND",
+   "board.GNDc",
+   "black"
+  ],
+  [
+   "relay.IN",
+   "board.PA4",
+   "yellow"
+  ],
+  [
+   "relay.COM",
+   "bat.V+",
+   "red"
+  ],
+  [
+   "relay.NO",
+   "pump.V+",
+   "red"
+  ],
+  [
+   "pump.V-",
+   "bat.V-",
+   "black"
+  ],
+  [
+   "bat.V-",
+   "board.GNDc",
+   "black"
+  ],
+  [
+   "d1.C",
+   "pump.V+"
+  ],
+  [
+   "d1.A",
+   "pump.V-"
+  ]
+ ],
+ "code": {
+  "sketch.ino": "/*\n * Smart Irrigation System - STM32F103C8 Blue Pill (Arduino STM32 core)\n * Ban mo phong cho Mokxi. Gan chan giong schematic/PCB cua nhom.\n *\n *  PA0  : cam bien do am dien dung (AOUT)            - ADC1_IN0\n *  PA4  : relay IN (kich muc THAP: LOW = bom ON)\n *  UART : mach that USART2 PA2/PA3; mo phong in ra Serial, 115200 baud\n *  PB0 RS, PB1 E, PB10..PB13 D4..D7 : LCD 16x2 (4-bit)\n *  PB5 MODE, PB6 UP, PB7 DOWN, PB8 PUMP : nut nhan (pull-up noi, nhan = LOW)\n *\n * 5 \"task\" chay theo chu ky bang millis() (khong chan), cung chu ky voi\n * thiet ke FreeRTOS: SensorRead 1000ms, ButtonProcess 20ms, Control 100ms,\n * Display 200ms, UART_Tx 1000ms.\n */\n#include <LiquidCrystal.h>\n\n// ---------------- Chan ----------------\nconst uint32_t PIN_SOIL  = PA0;\nconst uint32_t PIN_RELAY = PA4;\nconst uint32_t PIN_BTN[4] = {PB5, PB6, PB7, PB8};\nenum { BTN_MODE = 0, BTN_UP, BTN_DOWN, BTN_PUMP };\n\nLiquidCrystal lcd(PB0, PB1, PB10, PB11, PB12, PB13);\n// Mach that: USART2 (PA2 TX, PA3 RX). Mo phong: dung Serial de hien tren Serial Monitor.\n#define uart2 Serial\n\n// ---------------- Hieu chuan ADC ----------------\n// Cam bien dien dung: KHO -> dien ap CAO, UOT -> dien ap THAP.\n// Mac dinh theo cam bien mo phong (2.55 V kho, 1.27 V uot, VCC 3.3 V, ADC 12 bit).\n// Hieu chuan lai 2 hang so nay tren mach that.\nconst int ADC_DRY = 3164;  // ~2.55 V -> 0 %\nconst int ADC_WET = 1576;  // ~1.27 V -> 100 %\n\n// ---------------- Du lieu dung chung ----------------\nenum Mode { MODE_AUTO, MODE_MANUAL };\nstruct SystemData {\n  int  soil;       // %\n  int  setpoint;   // %\n  Mode mode;\n  bool pumpOn;\n} sys = {0, 60, MODE_AUTO, false};\n\n// ---------------- Relay ----------------\nvoid pumpSet(bool on) {\n  sys.pumpOn = on;\n  digitalWrite(PIN_RELAY, on ? LOW : HIGH);   // active-low\n}\n\n// ---------------- Cam bien ----------------\nint soilReadPercent() {\n  long sum = 0;\n  for (int i = 0; i < 8; i++) sum += analogRead(PIN_SOIL);\n  int raw = sum / 8;\n  long pct = (long)(raw - ADC_DRY) * 100 / (ADC_WET - ADC_DRY);\n  if (pct < 0) pct = 0;\n  if (pct > 100) pct = 100;\n  return (int)pct;\n}\n\n// ---------------- Nut nhan (chong doi 3 lan quet) ----------------\nuint8_t btnStable[4] = {HIGH, HIGH, HIGH, HIGH};\nuint8_t btnCount[4]  = {0, 0, 0, 0};\n\n// tra ve true dung 1 lan khi nut vua duoc nhan (HIGH -> LOW on dinh)\nbool buttonPressed(int i) {\n  uint8_t now = digitalRead(PIN_BTN[i]);\n  if (now != btnStable[i]) {\n    if (++btnCount[i] >= 3) {\n      btnStable[i] = now;\n      btnCount[i] = 0;\n      return now == LOW;\n    }\n  } else {\n    btnCount[i] = 0;\n  }\n  return false;\n}\n\n// ---------------- Cac \"task\" ----------------\nvoid taskSensorRead() { sys.soil = soilReadPercent(); }\n\nvoid taskButtonProcess() {\n  if (buttonPressed(BTN_MODE)) {\n    sys.mode = (sys.mode == MODE_AUTO) ? MODE_MANUAL : MODE_AUTO;\n    pumpSet(false);                              // doi che do -> tat bom\n  }\n  if (buttonPressed(BTN_UP)   && sys.setpoint < 100) sys.setpoint++;\n  if (buttonPressed(BTN_DOWN) && sys.setpoint > 0)   sys.setpoint--;\n  if (buttonPressed(BTN_PUMP) && sys.mode == MODE_MANUAL) pumpSet(!sys.pumpOn);\n}\n\nvoid taskControl() {\n  if (sys.mode == MODE_AUTO) {\n    if (sys.soil < sys.setpoint)       pumpSet(true);\n    else                               pumpSet(false);\n  }\n}\n\nvoid taskDisplay() {\n  char l1[17], l2[17];\n  snprintf(l1, sizeof(l1), \"SOIL%3d%% SET%3d%%\", sys.soil, sys.setpoint);\n  snprintf(l2, sizeof(l2), \"%-4s  PUMP:%-3s \", sys.mode == MODE_AUTO ? \"AUTO\" : \"MAN\",\n           sys.pumpOn ? \"ON\" : \"OFF\");\n  lcd.setCursor(0, 0); lcd.print(l1);\n  lcd.setCursor(0, 1); lcd.print(l2);\n}\n\nvoid taskUartTx() {\n  char buf[64];\n  snprintf(buf, sizeof(buf), \"SOIL: %d%% | SET: %d%% | MODE: %s | PUMP: %s\",\n           sys.soil, sys.setpoint, sys.mode == MODE_AUTO ? \"AUTO\" : \"MANUAL\",\n           sys.pumpOn ? \"ON\" : \"OFF\");\n  uart2.println(buf);\n}\n\n// ---------------- Bo lap lich don gian ----------------\nstruct Task { void (*fn)(); uint32_t period; uint32_t last; };\nTask tasks[] = {\n  {taskSensorRead,    1000, 0},\n  {taskButtonProcess,   20, 0},\n  {taskControl,        100, 0},\n  {taskDisplay,        200, 0},\n  {taskUartTx,        1000, 0},\n};\n\nvoid setup() {\n  pinMode(PIN_RELAY, OUTPUT);\n  pumpSet(false);                                // bom tat khi khoi dong\n  for (int i = 0; i < 4; i++) pinMode(PIN_BTN[i], INPUT_PULLUP);\n  analogReadResolution(12);\n  uart2.begin(115200);\n  lcd.begin(16, 2);\n  lcd.print(\"Smart Irrigation\");\n  delay(800);\n  lcd.clear();\n  taskSensorRead();\n}\n\nvoid loop() {\n  uint32_t now = millis();\n  for (auto &t : tasks) {\n    if (now - t.last >= t.period) {\n      t.last = now;\n      t.fn();\n    }\n  }\n}\n"
+ }
+}

@@ -1,0 +1,64 @@
+<mxfile host="Electron">
+  <diagram name="Page-1" id="CyTRVHMb2BY_Fh6T6UX8">
+    <mxGraphModel dx="1444" dy="1756" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="J0EcE3q1EtwHxg2PMedb-23" connectable="0" parent="1" style="group" value="" vertex="1">
+          <mxGeometry height="360" width="680" x="245" y="233" as="geometry" />
+        </mxCell>
+        <mxCell id="J0EcE3q1EtwHxg2PMedb-20" edge="1" parent="J0EcE3q1EtwHxg2PMedb-23" source="J0EcE3q1EtwHxg2PMedb-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="J0EcE3q1EtwHxg2PMedb-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="J0EcE3q1EtwHxg2PMedb-2" parent="J0EcE3q1EtwHxg2PMedb-23" style="rounded=0;whiteSpace=wrap;html=1;" value="STM32&lt;div&gt;(FreeRTOS)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="240" width="120" x="200" as="geometry" />
+        </mxCell>
+        <mxCell id="J0EcE3q1EtwHxg2PMedb-15" edge="1" parent="J0EcE3q1EtwHxg2PMedb-23" source="J0EcE3q1EtwHxg2PMedb-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="J0EcE3q1EtwHxg2PMedb-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="J0EcE3q1EtwHxg2PMedb-5" parent="J0EcE3q1EtwHxg2PMedb-23" style="rounded=0;whiteSpace=wrap;html=1;" value="Cảm biến độ ẩm" vertex="1">
+          <mxGeometry height="40" width="120" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="J0EcE3q1EtwHxg2PMedb-16" edge="1" parent="J0EcE3q1EtwHxg2PMedb-23" source="J0EcE3q1EtwHxg2PMedb-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="J0EcE3q1EtwHxg2PMedb-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="J0EcE3q1EtwHxg2PMedb-6" parent="J0EcE3q1EtwHxg2PMedb-23" style="rounded=0;whiteSpace=wrap;html=1;" value="4 nút bấm" vertex="1">
+          <mxGeometry height="40" width="120" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="J0EcE3q1EtwHxg2PMedb-7" parent="J0EcE3q1EtwHxg2PMedb-23" style="rounded=0;whiteSpace=wrap;html=1;" value="LCD 16x2" vertex="1">
+          <mxGeometry height="40" width="120" x="400" as="geometry" />
+        </mxCell>
+        <mxCell id="J0EcE3q1EtwHxg2PMedb-21" edge="1" parent="J0EcE3q1EtwHxg2PMedb-23" source="J0EcE3q1EtwHxg2PMedb-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="J0EcE3q1EtwHxg2PMedb-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="J0EcE3q1EtwHxg2PMedb-8" parent="J0EcE3q1EtwHxg2PMedb-23" style="rounded=0;whiteSpace=wrap;html=1;" value="Relay" vertex="1">
+          <mxGeometry height="40" width="120" x="400" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="J0EcE3q1EtwHxg2PMedb-10" parent="J0EcE3q1EtwHxg2PMedb-23" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Máy bơm" vertex="1">
+          <mxGeometry height="40" width="120" x="560" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="J0EcE3q1EtwHxg2PMedb-19" edge="1" parent="J0EcE3q1EtwHxg2PMedb-23" source="J0EcE3q1EtwHxg2PMedb-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;startArrow=classic;startFill=1;" target="J0EcE3q1EtwHxg2PMedb-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="J0EcE3q1EtwHxg2PMedb-11" parent="J0EcE3q1EtwHxg2PMedb-23" style="rounded=0;whiteSpace=wrap;html=1;" value="UART" vertex="1">
+          <mxGeometry height="40" width="120" x="400" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="J0EcE3q1EtwHxg2PMedb-12" parent="J0EcE3q1EtwHxg2PMedb-23" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Máy tính" vertex="1">
+          <mxGeometry height="40" width="120" x="560" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="J0EcE3q1EtwHxg2PMedb-17" edge="1" parent="J0EcE3q1EtwHxg2PMedb-23" source="J0EcE3q1EtwHxg2PMedb-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="J0EcE3q1EtwHxg2PMedb-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="J0EcE3q1EtwHxg2PMedb-13" parent="J0EcE3q1EtwHxg2PMedb-23" style="rounded=0;whiteSpace=wrap;html=1;" value="Khối nguồn" vertex="1">
+          <mxGeometry height="40" width="120" x="200" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="J0EcE3q1EtwHxg2PMedb-18" edge="1" parent="J0EcE3q1EtwHxg2PMedb-23" source="J0EcE3q1EtwHxg2PMedb-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.985;entryY=0.917;entryDx=0;entryDy=0;entryPerimeter=0;defaultLabelBackgroundColor=page;startArrow=classic;startFill=1;endArrow=classic;endFill=1;" target="J0EcE3q1EtwHxg2PMedb-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="J0EcE3q1EtwHxg2PMedb-22" edge="1" parent="J0EcE3q1EtwHxg2PMedb-23" source="J0EcE3q1EtwHxg2PMedb-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1.005;entryY=0.085;entryDx=0;entryDy=0;entryPerimeter=0;defaultLabelBackgroundColor=page;endArrow=none;endFill=0;startArrow=classic;startFill=1;" target="J0EcE3q1EtwHxg2PMedb-2">
+          <mxGeometry relative="1" x="0.0476" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

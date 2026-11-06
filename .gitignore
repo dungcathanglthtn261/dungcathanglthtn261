@@ -1,0 +1,17 @@
+# KiCad
+*.kicad_prl
+*.lck
+*-backups/
+.mcp-backups/
+fp-info-cache
+*.bak
+*.dsn
+*.ses
+*_drc_violations.json
+# Build
+build/
+Debug/
+Release/
+# OS
+.DS_Store
+~$*

@@ -1,0 +1,279 @@
+{
+  "version": 1,
+  "author": "Smart Irrigation - LTHTN",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-stm32-bluepill",
+      "id": "bp",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-lcd1602",
+      "id": "lcd",
+      "top": -230,
+      "left": -20,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "soil",
+      "top": 40,
+      "left": -260,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-relay-module",
+      "id": "relay",
+      "top": 40,
+      "left": 330,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 150,
+      "left": 470,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "pump",
+      "top": 100,
+      "left": 560,
+      "attrs": {
+        "color": "blue",
+        "label": "PUMP"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btnMode",
+      "top": 230,
+      "left": -60,
+      "attrs": {
+        "color": "green"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btnUp",
+      "top": 230,
+      "left": 50,
+      "attrs": {
+        "color": "blue"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btnDown",
+      "top": 230,
+      "left": 160,
+      "attrs": {
+        "color": "yellow"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btnPump",
+      "top": 230,
+      "left": 270,
+      "attrs": {
+        "color": "red"
+      }
+    }
+  ],
+  "connections": [
+    [
+      "lcd:RS",
+      "bp:B0",
+      "orange",
+      []
+    ],
+    [
+      "lcd:E",
+      "bp:B1",
+      "orange",
+      []
+    ],
+    [
+      "lcd:D4",
+      "bp:B10",
+      "orange",
+      []
+    ],
+    [
+      "lcd:D5",
+      "bp:B11",
+      "orange",
+      []
+    ],
+    [
+      "lcd:D6",
+      "bp:B12",
+      "orange",
+      []
+    ],
+    [
+      "lcd:D7",
+      "bp:B13",
+      "orange",
+      []
+    ],
+    [
+      "lcd:VSS",
+      "bp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "lcd:RW",
+      "bp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "lcd:K",
+      "bp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "lcd:VDD",
+      "bp:5V.1",
+      "red",
+      []
+    ],
+    [
+      "lcd:A",
+      "bp:5V.1",
+      "red",
+      []
+    ],
+    [
+      "soil:VCC",
+      "bp:3V3.1",
+      "red",
+      []
+    ],
+    [
+      "soil:GND",
+      "bp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "soil:SIG",
+      "bp:A0",
+      "green",
+      []
+    ],
+    [
+      "btnMode:1.l",
+      "bp:B5",
+      "green",
+      []
+    ],
+    [
+      "btnMode:2.l",
+      "bp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "btnUp:1.l",
+      "bp:B6",
+      "blue",
+      []
+    ],
+    [
+      "btnUp:2.l",
+      "bp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "btnDown:1.l",
+      "bp:B7",
+      "yellow",
+      []
+    ],
+    [
+      "btnDown:2.l",
+      "bp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "btnPump:1.l",
+      "bp:B8",
+      "red",
+      []
+    ],
+    [
+      "btnPump:2.l",
+      "bp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "relay:VCC",
+      "bp:5V.1",
+      "red",
+      []
+    ],
+    [
+      "relay:GND",
+      "bp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "relay:IN",
+      "bp:A4",
+      "purple",
+      []
+    ],
+    [
+      "relay:COM",
+      "bp:5V.1",
+      "red",
+      []
+    ],
+    [
+      "relay:NO",
+      "r1:1",
+      "blue",
+      []
+    ],
+    [
+      "r1:2",
+      "pump:A",
+      "blue",
+      []
+    ],
+    [
+      "pump:C",
+      "bp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "bp:A2",
+      "$serialMonitor:RX",
+      "green",
+      []
+    ],
+    [
+      "bp:A3",
+      "$serialMonitor:TX",
+      "green",
+      []
+    ]
+  ],
+  "dependencies": {}
+}

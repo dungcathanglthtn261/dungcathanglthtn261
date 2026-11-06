@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "smart_irrigation")(type "KiCad")(uri "${KIPRJMOD}/smart_irrigation.pretty")(options "")(descr "Project footprints"))
+)
