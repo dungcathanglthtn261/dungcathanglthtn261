@@ -1,0 +1,10 @@
+mach create "irrigation"
+machine LoadPlatformDescription @irrigation.repl
+sysbus LoadELF @build/Project.elf
+# SYSCLK 72 MHz (HSE 8 MHz x PLL 9) -> 72 MIPS de tick FreeRTOS dung thoi gian thuc
+sysbus.cpu PerformanceInMips 72
+logLevel 3
+logLevel -1 sysbus.gpioPortA.relay
+showAnalyzer sysbus.usart2
+machine StartGdbServer 3333
+start

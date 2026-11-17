@@ -4,6 +4,8 @@
 #include "app_config.h"
 
 #define SOIL_ADC_TIMEOUT_MS 10U
+/* Ngoai [WET-MARGIN, DRY+MARGIN] coi la cam bien ho mach/chap -> loi. */
+#define SOIL_ADC_MARGIN     300U
 
 void soil_sensor_init(void)
 {
@@ -41,6 +43,10 @@ bool soil_sensor_read_percent(uint8_t *percent)
     }
 
     uint32_t raw = sum / SOIL_AVERAGE_SAMPLES;
+    if ((raw + SOIL_ADC_MARGIN < SOIL_ADC_WET) || (raw > SOIL_ADC_DRY + SOIL_ADC_MARGIN))
+    {
+        return false;
+    }
     int32_t numerator = ((int32_t)raw - (int32_t)SOIL_ADC_DRY) * 100;
     int32_t denominator = (int32_t)SOIL_ADC_WET - (int32_t)SOIL_ADC_DRY;
     int32_t mapped = numerator / denominator;

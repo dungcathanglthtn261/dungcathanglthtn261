@@ -15,3 +15,5 @@ Release/
 # OS
 .DS_Store
 ~$*
+# Snapshot nhanh Ca (make ca)
+.ca/

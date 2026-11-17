@@ -34,7 +34,6 @@
 #include "uart_comm.h"
 #include "irrigation_control.h"
 #include <stdio.h>
-#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -55,6 +54,8 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 volatile uint32_t g_button_press_count[BUTTON_COUNT] = {0U};
+/* Lenh UART = nut ao; chi ISR UART (uart_comm.c) ghi, tach rieng de khong tranh ghi voi task Button. */
+volatile uint32_t g_uart_press_count[BUTTON_COUNT] = {0U};
 system_data_t g_system_data =
 {
     .soil_percent = 0U,
@@ -140,15 +141,15 @@ void MX_FREERTOS_Init(void) {
   sensorTaskHandle = osThreadCreate(osThread(sensorTask), NULL);
 
   /* definition and creation of controlTask */
-  osThreadDef(controlTask, StartcontrolTask, osPriorityNormal, 0, 128);
+  osThreadDef(controlTask, StartcontrolTask, osPriorityAboveNormal, 0, 128);
   controlTaskHandle = osThreadCreate(osThread(controlTask), NULL);
 
   /* definition and creation of displayTask */
-  osThreadDef(displayTask, StartdisplayTask, osPriorityNormal, 0, 128);
+  osThreadDef(displayTask, StartdisplayTask, osPriorityBelowNormal, 0, 384);
   displayTaskHandle = osThreadCreate(osThread(displayTask), NULL);
 
   /* definition and creation of uartTask */
-  osThreadDef(uartTask, StartuartTask, osPriorityNormal, 0, 384);
+  osThreadDef(uartTask, StartuartTask, osPriorityBelowNormal, 0, 384);
   uartTaskHandle = osThreadCreate(osThread(uartTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -196,21 +197,20 @@ void StartbuttonTask(void const * argument)
 void StartsensorTask(void const * argument)
 {
   /* USER CODE BEGIN StartsensorTask */
-  uint8_t percent;
   soil_sensor_init();
   /* Infinite loop */
   for(;;)
   {
-    bool valid = soil_sensor_read_percent(&percent);
+    uint8_t percent = 0U;
+    bool ok = soil_sensor_read_percent(&percent);   /* doc ADC ngoai mutex cho ngan */
+
     if (osMutexWait(systemDataMutexHandle, osWaitForever) == osOK)
     {
-      if (valid)
-      {
-        g_system_data.soil_percent = percent;
-      }
-      g_system_data.sensor_valid = valid;
+      if (ok) { g_system_data.soil_percent = percent; }
+      g_system_data.sensor_valid = ok;
       osMutexRelease(systemDataMutexHandle);
     }
+
     osDelay(SENSOR_PERIOD_MS);
   }
   /* USER CODE END StartsensorTask */
@@ -227,6 +227,8 @@ void StartcontrolTask(void const * argument)
 {
   /* USER CODE BEGIN StartcontrolTask */
   uint32_t handled[BUTTON_COUNT] = {0U};
+  uint32_t handled_uart[BUTTON_COUNT] = {0U};
+
   if (osMutexWait(systemDataMutexHandle, osWaitForever) == osOK)
   {
     irrigation_control_init(&g_system_data);
@@ -237,18 +239,24 @@ void StartcontrolTask(void const * argument)
   {
     if (osMutexWait(systemDataMutexHandle, osWaitForever) == osOK)
     {
+      /* So lan nhan do task Button dem; xu ly phan chenh lech. */
       for (uint32_t i = 0U; i < BUTTON_COUNT; i++)
       {
-        uint32_t pending = g_button_press_count[i];
-        while (handled[i] != pending)
+        while (handled[i] != g_button_press_count[i])
         {
-          irrigation_control_handle_button(&g_system_data, (button_id_t)i);
           handled[i]++;
+          irrigation_control_handle_button(&g_system_data, (button_id_t)i);
+        }
+        while (handled_uart[i] != g_uart_press_count[i])
+        {
+          handled_uart[i]++;
+          irrigation_control_handle_button(&g_system_data, (button_id_t)i);
         }
       }
       irrigation_control_update(&g_system_data);
       osMutexRelease(systemDataMutexHandle);
     }
+
     osDelay(CONTROL_PERIOD_MS);
   }
   /* USER CODE END StartcontrolTask */
@@ -264,51 +272,35 @@ void StartcontrolTask(void const * argument)
 void StartdisplayTask(void const * argument)
 {
   /* USER CODE BEGIN StartdisplayTask */
-  system_data_t snapshot;
-  char line0[17];
+  static const char *const MODE_STR[] = { "AUTO", "MAN", "IDLE", "ERR" };   /* theo thu tu system_mode_t */
   char line1[17];
-  char last0[17] = {0};
-  char last1[17] = {0};
-  bool have_lines = false;
+  char line2[17];
 
   lcd16x02_init();
+  lcd16x02_write_line(0U, "Smart Irrigation");
+  osDelay(800);
   /* Infinite loop */
   for(;;)
   {
     if (osMutexWait(systemDataMutexHandle, osWaitForever) == osOK)
     {
-      snapshot = g_system_data;
-      osMutexRelease(systemDataMutexHandle);
+      system_data_t s = g_system_data;
+      osMutexRelease(systemDataMutexHandle);           /* ghi LCD cham, khong giu mutex */
 
-      memset(line0, 0, sizeof(line0));
-      memset(line1, 0, sizeof(line1));
-      if (snapshot.sensor_valid)
+      if (s.sensor_valid)
       {
-        (void)snprintf(line0, sizeof(line0), "S:%3u%% SET:%3u%%",
-                       (unsigned int)snapshot.soil_percent,
-                       (unsigned int)snapshot.setpoint_percent);
+        snprintf(line1, sizeof line1, "SOIL%3u%% SET%3u%%", s.soil_percent, s.setpoint_percent);
       }
       else
       {
-        (void)snprintf(line0, sizeof(line0), "S: --%% SET:%3u%%",
-                       (unsigned int)snapshot.setpoint_percent);
+        snprintf(line1, sizeof line1, "SOIL ERR SET%3u%%", s.setpoint_percent);
       }
-      (void)snprintf(line1, sizeof(line1), "%s PUMP:%s",
-                     (snapshot.mode == MODE_AUTO) ? "AUTO" : "MANUAL",
-                     snapshot.pump_on ? "ON" : "OFF");
-
-      if (!have_lines || (memcmp(line0, last0, sizeof(line0)) != 0))
-      {
-        lcd16x02_write_line(0U, line0);
-        memcpy(last0, line0, sizeof(line0));
-      }
-      if (!have_lines || (memcmp(line1, last1, sizeof(line1)) != 0))
-      {
-        lcd16x02_write_line(1U, line1);
-        memcpy(last1, line1, sizeof(line1));
-      }
-      have_lines = true;
+      snprintf(line2, sizeof line2, "%-4s  PUMP:%-3s",
+               MODE_STR[s.mode], s.pump_on ? "ON" : "OFF");
+      lcd16x02_write_line(0U, line1);
+      lcd16x02_write_line(1U, line2);
     }
+
     osDelay(DISPLAY_PERIOD_MS);
   }
   /* USER CODE END StartdisplayTask */
@@ -339,7 +331,7 @@ void StartuartTask(void const * argument)
 	  uart_comm_send_status(&snapshot);
 	}
 
-    osDelay(UART_PERIOD_MS);
+	osDelay(UART_PERIOD_MS);
   }
   /* USER CODE END StartuartTask */
 }
