@@ -1,0 +1,9 @@
+flowchart TD
+  A([Task_UART_Tx<br/>chu kỳ 1000 ms]) --> B[Khóa mutex, sao chép dữ liệu, mở mutex]
+  B --> T{Lần gửi trước<br/>đã xong?}
+  T -- Chưa --> E
+  T -- Rồi --> C["Tạo chuỗi:<br/>SOIL: xx% | SET: yy% | MODE: AUTO/MANUAL<br/>| PUMP: ON/OFF | VALID: 0/1"]
+  C --> D[Gửi qua USART2 bằng ngắt<br/>HAL_UART_Transmit_IT]
+  D --> E[osDelay 1000 ms]
+  E --> B
+  D -.-> CB[/Ngắt TxCplt:<br/>đánh dấu gửi xong/]

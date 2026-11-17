@@ -1,0 +1,12 @@
+flowchart TD
+  A([Task_ButtonProcess<br/>chu kỳ 20 ms]) --> A1[Đọc trạng thái ban đầu 4 nút]
+  A1 --> B[Đọc 4 nút MODE, UP, DOWN, PUMP]
+  B --> C{Khác trạng thái ổn định<br/>3 lần quét liên tiếp?}
+  C -- Không --> Z
+  C -- Có --> D[Cập nhật trạng thái ổn định]
+  D --> E{Mức LOW?<br/>vừa nhấn}
+  E -- Không: vừa nhả --> Z
+  E -- Có --> F[Tăng bộ đếm số lần nhấn<br/>của nút đó]
+  F --> Z[osDelay 20 ms]
+  Z --> B
+  F -.-> N[/Task_Control đọc bộ đếm<br/>và xử lý nút/]

@@ -1,0 +1,26 @@
+flowchart TD
+  A([Task_Control<br/>chu kỳ 100 ms]) --> A1[Khởi tạo relay: bơm OFF]
+  A1 --> B[Khóa mutex]
+  B --> P{Còn lần nhấn nút<br/>chưa xử lý?}
+  P -- Có --> Q{Nút nào?}
+  Q -- MODE --> Q1[Đổi AUTO ↔ MANUAL<br/>bơm giữ nguyên trạng thái] --> P
+  Q -- UP --> Q2{Setpoint + 5 ≤ 90?}
+  Q2 -- Có --> Q3[Setpoint + 5] --> P
+  Q2 -- Không --> P
+  Q -- DOWN --> Q4{Setpoint − 5 ≥ 10?}
+  Q4 -- Có --> Q5[Setpoint − 5] --> P
+  Q4 -- Không --> P
+  Q -- PUMP --> Q6{Mode = MANUAL?}
+  Q6 -- Có --> Q7[Đảo trạng thái bơm] --> P
+  Q6 -- Không --> P
+  P -- Không --> C{Mode = AUTO?}
+  C -- Không: MANUAL --> G[Giữ trạng thái bơm<br/>do nút PUMP quyết định]
+  C -- Có --> D{sensor_valid và<br/>soil &lt; setpoint?}
+  D -- Có --> E[Bơm ON]
+  D -- Không --> F[Bơm OFF]
+  E --> R[Xuất relay:<br/>ON → IN = LOW, OFF → IN = HIGH]
+  F --> R
+  G --> R
+  R --> H[Mở mutex]
+  H --> I[osDelay 100 ms]
+  I --> B

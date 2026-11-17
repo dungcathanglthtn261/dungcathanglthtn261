@@ -8,6 +8,8 @@
 | `hardware/` | KiCad: schematic, PCB, thư viện footprint/symbol |
 | `hardware/images/` | Ảnh preview PCB |
 | `hardware/routing/` | File Freerouting (.dsn/.ses) và kết quả DRC |
+| `docs/block-diagram/` | Sơ đồ khối hệ thống (draw.io, PNG, Visio) |
+| `docs/flowcharts/` | Lưu đồ thuật toán `main` và 5 task (Mermaid `.mmd` + PNG), khớp với code firmware |
 | `docs/` | [Báo cáo mô phỏng Renode](docs/bao-cao-mo-phong-renode.md): mô hình phần cứng, kịch bản kiểm thử, log kết quả |
 
 ## Phân chia với nhánh `Ca`
