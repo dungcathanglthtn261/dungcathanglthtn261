@@ -4,7 +4,7 @@
 **Môn:** Lập trình Hệ thống nhúng, HK261
 **Ngày chạy mô phỏng:** 17/11/2026
 
-> **Lưu ý:** kết quả trong báo cáo này đo trên commit `2958e75` của nhánh `Dung`. Nay 3 driver `lcd16x02`, `soil_sensor`, `relay_pump` lấy từ `firmware/middleware/` của nhánh `Ca` (`make ca`); bộ test chạy lại trên Ca `6bcdbb6` vẫn đạt cả 3 tình huống.
+> **Lưu ý:** kết quả trong báo cáo này đo trên commit `2958e75` của nhánh `Dung`. 3 driver `lcd16x02`, `soil_sensor`, `relay_pump` nay nằm trong `firmware/SmartIrrigation/Core/` (trước đây ở `firmware/middleware/`); bộ test hiện tại (`test_irrigation.resc`, 13 bước) vẫn đạt 13/13.
 
 ---
 
