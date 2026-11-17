@@ -25,7 +25,6 @@ renode -e "i @irrigation.resc"                                      # interactiv
 - Always use `renode -e "include @..."`. Passing the script as an argument fails with `Could not tokenize` because the repo path contains spaces.
 - Each test step in `test_irrigation.resc` prints `=== Tn ... expect True|False`, then the relay state (`True` = pump ON). There is no per-test runner. To run one scenario, copy the setup lines plus that block into a new `.resc`, or drive it interactively from the monitor.
 - Sim controls: `sysbus WriteDoubleWord 0x400127FC <raw 0..4095>` sets the soil ADC value. Percent = `(raw-3164)*100/(1576-3164)`; raw outside `[WET-300, DRY+300]` makes the sensor read invalid. `sysbus.gpioPortB OnGPIO <5|6|7|8> false/true` presses/releases MODE/UP/DOWN/PUMP (pull-up: `true` = released). `sysbus.usart2 WriteChar 0x6D` sends a UART command. `sysbus.gpioPortA.relay State` reads the pump.
-- Flowcharts: `docs/flowcharts/*.mmd` are rendered to PNG with mermaid-cli (`mmdc -i X.mmd -o X.png -b white -s 2`). Re-render the PNG whenever a `.mmd` changes.
 
 ## Build system quirks (Makefile)
 

@@ -19,15 +19,13 @@ Nhóm: Dũng · Ca · Thắng
 ## Cấu trúc repo
 
 ```
-docs/                Đề tài, yêu cầu chung, bảng phân công, sơ đồ khối
+docs/block-diagram/  Sơ đồ khối
 hardware/kicad/      Project KiCad: schematic, PCB 10x10 cm, thư viện symbol/footprint riêng
 hardware/images/     Ảnh xem nhanh schematic và PCB
 firmware/SmartIrrigation/  Project STM32CubeIDE + FreeRTOS (5 task, Task_Control), Makefile, mô phỏng Renode (*.repl, *.resc)
 firmware/middleware/ Driver soil_sensor, lcd16x02, relay_pump
 firmware/app/        Bản phác thảo firmware ban đầu (trước CubeMX)
 hardware/routing/    File Freerouting (.dsn/.ses) và kết quả DRC
-docs/test/           Kịch bản kiểm thử
-docs/flowcharts/     Lưu đồ giải thuật main + 5 task (mermaid + png), khớp với firmware
 docs/bao-cao-mo-phong-renode.md  Báo cáo mô phỏng Renode
 simulation/mokxi/    diagram.json (định dạng Wokwi) + sketch.ino để mô phỏng trên Mokxi/Wokwi
 ```

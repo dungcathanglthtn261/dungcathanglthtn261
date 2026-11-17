@@ -1,8 +1,0 @@
-flowchart TD
-  A([BẮT ĐẦU]) --> B[HAL_Init, cấu hình xung nhịp<br/>HSE 8 MHz × PLL 9 = 72 MHz]
-  B --> C[Khởi tạo GPIO, ADC1, USART2]
-  C --> D[Dữ liệu dùng chung ban đầu:<br/>Mode = AUTO, Setpoint = 60%,<br/>bơm OFF, cảm biến chưa hợp lệ]
-  D --> E[Tạo mutex systemDataMutex]
-  E --> F[Tạo 5 task:<br/>ButtonProcess, SensorRead,<br/>Control, Display, UART_Tx]
-  F --> G[osKernelStart]
-  G --> H([Bộ lập lịch FreeRTOS<br/>chạy các task])
