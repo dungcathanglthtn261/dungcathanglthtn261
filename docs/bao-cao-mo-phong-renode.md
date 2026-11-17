@@ -4,6 +4,8 @@
 **Môn:** Lập trình Hệ thống nhúng, HK261
 **Ngày chạy mô phỏng:** 17/11/2026
 
+> **Lưu ý:** kết quả trong báo cáo này đo trên commit `2958e75` của nhánh `Dung`. Từ commit `df55ced`, nhánh `Dung` không còn `lcd16x02.c`, `soil_sensor.c`, `relay_pump.c`, nên muốn chạy lại phải có lại 3 file này (xem README).
+
 ---
 
 ## 1. Mục tiêu
@@ -25,7 +27,7 @@ Renode chạy chính file ELF biên dịch cho Cortex-M3, nên khác với mô p
 | Hệ điều hành | Ubuntu 26.04.1 LTS |
 | Trình mô phỏng | Renode v1.17.0 |
 | Trình biên dịch | arm-none-eabi-gcc 14.2.1 |
-| Firmware | STM32CubeMX (HAL F1) + FreeRTOS (CMSIS-RTOS v1), build bằng `Makefile`. Khung CubeMX, `button`, `uart_comm` lấy từ nhánh `Ca`; `lcd16x02`, `soil_sensor`, `relay_pump`, thân task từ nhánh `Dung` |
+| Firmware | STM32CubeMX (HAL F1) + FreeRTOS (CMSIS-RTOS v1), build bằng `Makefile`. Khung CubeMX, `button`, `uart_comm` lấy từ nhánh `Ca`; `lcd16x02`, `soil_sensor`, `relay_pump`, thân task từ nhánh `Dung` (commit `2958e75`) |
 
 Kích thước firmware:
 
@@ -160,6 +162,8 @@ renode --console --disable-gui -e "include @test_irrigation.resc"
 ## 6. Cách chạy lại
 
 Xem hướng dẫn từng bước trong [README.md](../README.md#mô-phỏng-freertos-trên-renode). Tóm tắt:
+
+Cần có đủ `lcd16x02.c`, `soil_sensor.c`, `relay_pump.c` trong `Core/Src/` (xem lưu ý đầu báo cáo).
 
 ```bash
 cd firmware/SmartIrrigation
