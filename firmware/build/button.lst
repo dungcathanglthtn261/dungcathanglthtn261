@@ -1,0 +1,409 @@
+ARM GAS  /tmp/ccWs9xbz.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"button.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.file 1 "Core/Src/button.c"
+  18              		.section	.text.button_init,"ax",%progbits
+  19              		.align	1
+  20              		.global	button_init
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	button_init:
+  26              	.LFB65:
+   1:Core/Src/button.c **** #include "button.h"
+   2:Core/Src/button.c **** #include "app_config.h"
+   3:Core/Src/button.c **** #include "main.h"
+   4:Core/Src/button.c **** 
+   5:Core/Src/button.c **** typedef struct
+   6:Core/Src/button.c **** {
+   7:Core/Src/button.c ****     GPIO_TypeDef *port;
+   8:Core/Src/button.c ****     uint16_t pin;
+   9:Core/Src/button.c ****     GPIO_PinState stable;
+  10:Core/Src/button.c ****     uint8_t count;
+  11:Core/Src/button.c ****     bool pending_press;
+  12:Core/Src/button.c **** } button_state_t;
+  13:Core/Src/button.c **** 
+  14:Core/Src/button.c **** static button_state_t buttons[BUTTON_COUNT] =
+  15:Core/Src/button.c **** {
+  16:Core/Src/button.c ****     [BUTTON_MODE] =
+  17:Core/Src/button.c ****     {
+  18:Core/Src/button.c ****         .port = BTN_MODE_GPIO_Port,
+  19:Core/Src/button.c ****         .pin  = BTN_MODE_Pin
+  20:Core/Src/button.c ****     },
+  21:Core/Src/button.c ****     [BUTTON_UP] =
+  22:Core/Src/button.c ****     {
+  23:Core/Src/button.c ****         .port = BTN_UP_GPIO_Port,
+  24:Core/Src/button.c ****         .pin  = BTN_UP_Pin
+  25:Core/Src/button.c ****     },
+  26:Core/Src/button.c ****     [BUTTON_DOWN] =
+  27:Core/Src/button.c ****     {
+  28:Core/Src/button.c ****         .port = BTN_DOWN_GPIO_Port,
+  29:Core/Src/button.c ****         .pin  = BTN_DOWN_Pin
+  30:Core/Src/button.c ****     },
+  31:Core/Src/button.c ****     [BUTTON_PUMP] =
+  32:Core/Src/button.c ****     {
+ARM GAS  /tmp/ccWs9xbz.s 			page 2
+
+
+  33:Core/Src/button.c ****         .port = BTN_PUMP_GPIO_Port,
+  34:Core/Src/button.c ****         .pin  = BTN_PUMP_Pin
+  35:Core/Src/button.c ****     }
+  36:Core/Src/button.c **** };
+  37:Core/Src/button.c **** 
+  38:Core/Src/button.c **** void button_init(void)
+  39:Core/Src/button.c **** {
+  27              		.loc 1 39 1 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31 0000 38B5     		push	{r3, r4, r5, lr}
+  32              	.LCFI0:
+  33              		.cfi_def_cfa_offset 16
+  34              		.cfi_offset 3, -16
+  35              		.cfi_offset 4, -12
+  36              		.cfi_offset 5, -8
+  37              		.cfi_offset 14, -4
+  40:Core/Src/button.c ****     for (uint32_t i = 0U; i < BUTTON_COUNT; i++)
+  38              		.loc 1 40 5 view .LVU1
+  39              	.LBB2:
+  40              		.loc 1 40 10 view .LVU2
+  41              	.LVL0:
+  42              		.loc 1 40 19 is_stmt 0 view .LVU3
+  43 0002 0024     		movs	r4, #0
+  44              		.loc 1 40 5 view .LVU4
+  45 0004 0EE0     		b	.L2
+  46              	.LVL1:
+  47              	.L3:
+  41:Core/Src/button.c ****     {
+  42:Core/Src/button.c ****         buttons[i].stable =
+  48              		.loc 1 42 9 is_stmt 1 view .LVU5
+  43:Core/Src/button.c ****             HAL_GPIO_ReadPin(buttons[i].port, buttons[i].pin);
+  49              		.loc 1 43 13 is_stmt 0 view .LVU6
+  50 0006 094B     		ldr	r3, .L5
+  51 0008 04EB4402 		add	r2, r4, r4, lsl #1
+  52 000c 03EB8205 		add	r5, r3, r2, lsl #2
+  53 0010 A988     		ldrh	r1, [r5, #4]
+  54 0012 53F82200 		ldr	r0, [r3, r2, lsl #2]
+  55 0016 FFF7FEFF 		bl	HAL_GPIO_ReadPin
+  56              	.LVL2:
+  42:Core/Src/button.c ****             HAL_GPIO_ReadPin(buttons[i].port, buttons[i].pin);
+  57              		.loc 1 42 27 view .LVU7
+  58 001a A871     		strb	r0, [r5, #6]
+  44:Core/Src/button.c **** 
+  45:Core/Src/button.c ****         buttons[i].count = 0U;
+  59              		.loc 1 45 9 is_stmt 1 view .LVU8
+  60              		.loc 1 45 26 is_stmt 0 view .LVU9
+  61 001c 0023     		movs	r3, #0
+  62 001e EB71     		strb	r3, [r5, #7]
+  46:Core/Src/button.c ****         buttons[i].pending_press = false;
+  63              		.loc 1 46 9 is_stmt 1 view .LVU10
+  64              		.loc 1 46 34 is_stmt 0 view .LVU11
+  65 0020 2B72     		strb	r3, [r5, #8]
+  40:Core/Src/button.c ****     {
+  66              		.loc 1 40 46 is_stmt 1 discriminator 3 view .LVU12
+  67 0022 0134     		adds	r4, r4, #1
+ARM GAS  /tmp/ccWs9xbz.s 			page 3
+
+
+  68              	.LVL3:
+  69              	.L2:
+  40:Core/Src/button.c ****     {
+  70              		.loc 1 40 29 discriminator 1 view .LVU13
+  71 0024 032C     		cmp	r4, #3
+  72 0026 EED9     		bls	.L3
+  73              	.LBE2:
+  47:Core/Src/button.c ****     }
+  48:Core/Src/button.c **** }
+  74              		.loc 1 48 1 is_stmt 0 view .LVU14
+  75 0028 38BD     		pop	{r3, r4, r5, pc}
+  76              	.LVL4:
+  77              	.L6:
+  78              		.loc 1 48 1 view .LVU15
+  79 002a 00BF     		.align	2
+  80              	.L5:
+  81 002c 00000000 		.word	buttons
+  82              		.cfi_endproc
+  83              	.LFE65:
+  85              		.section	.text.button_process,"ax",%progbits
+  86              		.align	1
+  87              		.global	button_process
+  88              		.syntax unified
+  89              		.thumb
+  90              		.thumb_func
+  92              	button_process:
+  93              	.LFB66:
+  49:Core/Src/button.c **** 
+  50:Core/Src/button.c **** void button_process(void)
+  51:Core/Src/button.c **** {
+  94              		.loc 1 51 1 is_stmt 1 view -0
+  95              		.cfi_startproc
+  96              		@ args = 0, pretend = 0, frame = 0
+  97              		@ frame_needed = 0, uses_anonymous_args = 0
+  98 0000 38B5     		push	{r3, r4, r5, lr}
+  99              	.LCFI1:
+ 100              		.cfi_def_cfa_offset 16
+ 101              		.cfi_offset 3, -16
+ 102              		.cfi_offset 4, -12
+ 103              		.cfi_offset 5, -8
+ 104              		.cfi_offset 14, -4
+  52:Core/Src/button.c ****     for (uint32_t i = 0U; i < BUTTON_COUNT; i++)
+ 105              		.loc 1 52 5 view .LVU17
+ 106              	.LBB3:
+ 107              		.loc 1 52 10 view .LVU18
+ 108              	.LVL5:
+ 109              		.loc 1 52 19 is_stmt 0 view .LVU19
+ 110 0002 0024     		movs	r4, #0
+ 111              		.loc 1 52 5 view .LVU20
+ 112 0004 02E0     		b	.L8
+ 113              	.LVL6:
+ 114              	.L14:
+ 115              	.LBB4:
+  53:Core/Src/button.c ****     {
+  54:Core/Src/button.c ****         button_state_t *button = &buttons[i];
+  55:Core/Src/button.c **** 
+  56:Core/Src/button.c ****         GPIO_PinState current =
+ARM GAS  /tmp/ccWs9xbz.s 			page 4
+
+
+  57:Core/Src/button.c ****             HAL_GPIO_ReadPin(button->port, button->pin);
+  58:Core/Src/button.c **** 
+  59:Core/Src/button.c ****         if (current == button->stable)
+  60:Core/Src/button.c ****         {
+  61:Core/Src/button.c ****             button->count = 0U;
+ 116              		.loc 1 61 13 is_stmt 1 view .LVU21
+ 117              		.loc 1 61 27 is_stmt 0 view .LVU22
+ 118 0006 0022     		movs	r2, #0
+ 119 0008 EA71     		strb	r2, [r5, #7]
+  62:Core/Src/button.c ****             continue;
+ 120              		.loc 1 62 13 is_stmt 1 view .LVU23
+ 121              	.L10:
+ 122              	.LBE4:
+  52:Core/Src/button.c ****     for (uint32_t i = 0U; i < BUTTON_COUNT; i++)
+ 123              		.loc 1 52 46 discriminator 2 view .LVU24
+ 124 000a 0134     		adds	r4, r4, #1
+ 125              	.LVL7:
+ 126              	.L8:
+  52:Core/Src/button.c ****     for (uint32_t i = 0U; i < BUTTON_COUNT; i++)
+ 127              		.loc 1 52 29 discriminator 1 view .LVU25
+ 128 000c 032C     		cmp	r4, #3
+ 129 000e 29D8     		bhi	.L13
+ 130              	.LBB5:
+  54:Core/Src/button.c **** 
+ 131              		.loc 1 54 9 view .LVU26
+ 132              	.LVL8:
+  56:Core/Src/button.c ****             HAL_GPIO_ReadPin(button->port, button->pin);
+ 133              		.loc 1 56 9 view .LVU27
+  57:Core/Src/button.c **** 
+ 134              		.loc 1 57 13 is_stmt 0 view .LVU28
+ 135 0010 154B     		ldr	r3, .L15
+ 136 0012 04EB4402 		add	r2, r4, r4, lsl #1
+ 137 0016 03EB8205 		add	r5, r3, r2, lsl #2
+ 138 001a A988     		ldrh	r1, [r5, #4]
+ 139 001c 53F82200 		ldr	r0, [r3, r2, lsl #2]
+ 140 0020 FFF7FEFF 		bl	HAL_GPIO_ReadPin
+ 141              	.LVL9:
+  59:Core/Src/button.c ****         {
+ 142              		.loc 1 59 9 is_stmt 1 view .LVU29
+  59:Core/Src/button.c ****         {
+ 143              		.loc 1 59 30 is_stmt 0 view .LVU30
+ 144 0024 AB79     		ldrb	r3, [r5, #6]	@ zero_extendqisi2
+  59:Core/Src/button.c ****         {
+ 145              		.loc 1 59 12 view .LVU31
+ 146 0026 8342     		cmp	r3, r0
+ 147 0028 EDD0     		beq	.L14
+  63:Core/Src/button.c ****         }
+  64:Core/Src/button.c **** 
+  65:Core/Src/button.c ****         button->count++;
+ 148              		.loc 1 65 9 is_stmt 1 view .LVU32
+ 149              		.loc 1 65 15 is_stmt 0 view .LVU33
+ 150 002a 04EB4403 		add	r3, r4, r4, lsl #1
+ 151 002e 0E4A     		ldr	r2, .L15
+ 152 0030 02EB8302 		add	r2, r2, r3, lsl #2
+ 153 0034 D379     		ldrb	r3, [r2, #7]	@ zero_extendqisi2
+ 154              		.loc 1 65 22 view .LVU34
+ 155 0036 0133     		adds	r3, r3, #1
+ARM GAS  /tmp/ccWs9xbz.s 			page 5
+
+
+ 156 0038 DBB2     		uxtb	r3, r3
+ 157 003a D371     		strb	r3, [r2, #7]
+  66:Core/Src/button.c **** 
+  67:Core/Src/button.c ****         if (button->count >= BUTTON_DEBOUNCE_SAMPLES)
+ 158              		.loc 1 67 9 is_stmt 1 view .LVU35
+ 159              		.loc 1 67 12 is_stmt 0 view .LVU36
+ 160 003c 022B     		cmp	r3, #2
+ 161 003e E4D9     		bls	.L10
+  68:Core/Src/button.c ****         {
+  69:Core/Src/button.c ****             button->stable = current;
+ 162              		.loc 1 69 13 is_stmt 1 view .LVU37
+ 163              		.loc 1 69 28 is_stmt 0 view .LVU38
+ 164 0040 04EB4402 		add	r2, r4, r4, lsl #1
+ 165 0044 084B     		ldr	r3, .L15
+ 166 0046 03EB8203 		add	r3, r3, r2, lsl #2
+ 167 004a 9871     		strb	r0, [r3, #6]
+  70:Core/Src/button.c ****             button->count = 0U;
+ 168              		.loc 1 70 13 is_stmt 1 view .LVU39
+ 169              		.loc 1 70 27 is_stmt 0 view .LVU40
+ 170 004c 0022     		movs	r2, #0
+ 171 004e DA71     		strb	r2, [r3, #7]
+  71:Core/Src/button.c **** 
+  72:Core/Src/button.c ****             /* Pull-up: nhan nut tuong ung muc LOW. */
+  73:Core/Src/button.c ****             if (current == GPIO_PIN_RESET)
+ 172              		.loc 1 73 13 is_stmt 1 view .LVU41
+ 173              		.loc 1 73 16 is_stmt 0 view .LVU42
+ 174 0050 0028     		cmp	r0, #0
+ 175 0052 DAD1     		bne	.L10
+  74:Core/Src/button.c ****             {
+  75:Core/Src/button.c ****                 button->pending_press = true;
+ 176              		.loc 1 75 17 is_stmt 1 view .LVU43
+ 177              		.loc 1 75 39 is_stmt 0 view .LVU44
+ 178 0054 04EB4402 		add	r2, r4, r4, lsl #1
+ 179 0058 034B     		ldr	r3, .L15
+ 180 005a 03EB8203 		add	r3, r3, r2, lsl #2
+ 181 005e 0122     		movs	r2, #1
+ 182 0060 1A72     		strb	r2, [r3, #8]
+ 183 0062 D2E7     		b	.L10
+ 184              	.LVL10:
+ 185              	.L13:
+ 186              		.loc 1 75 39 view .LVU45
+ 187              	.LBE5:
+ 188              	.LBE3:
+  76:Core/Src/button.c ****             }
+  77:Core/Src/button.c ****         }
+  78:Core/Src/button.c ****     }
+  79:Core/Src/button.c **** }
+ 189              		.loc 1 79 1 view .LVU46
+ 190 0064 38BD     		pop	{r3, r4, r5, pc}
+ 191              	.LVL11:
+ 192              	.L16:
+ 193              		.loc 1 79 1 view .LVU47
+ 194 0066 00BF     		.align	2
+ 195              	.L15:
+ 196 0068 00000000 		.word	buttons
+ 197              		.cfi_endproc
+ 198              	.LFE66:
+ARM GAS  /tmp/ccWs9xbz.s 			page 6
+
+
+ 200              		.section	.text.button_take_press,"ax",%progbits
+ 201              		.align	1
+ 202              		.global	button_take_press
+ 203              		.syntax unified
+ 204              		.thumb
+ 205              		.thumb_func
+ 207              	button_take_press:
+ 208              	.LVL12:
+ 209              	.LFB67:
+  80:Core/Src/button.c **** 
+  81:Core/Src/button.c **** bool button_take_press(button_id_t id)
+  82:Core/Src/button.c **** {
+ 210              		.loc 1 82 1 is_stmt 1 view -0
+ 211              		.cfi_startproc
+ 212              		@ args = 0, pretend = 0, frame = 0
+ 213              		@ frame_needed = 0, uses_anonymous_args = 0
+ 214              		@ link register save eliminated.
+  83:Core/Src/button.c ****     if ((unsigned int)id >= (unsigned int)BUTTON_COUNT)
+ 215              		.loc 1 83 5 view .LVU49
+ 216              		.loc 1 83 8 is_stmt 0 view .LVU50
+ 217 0000 0328     		cmp	r0, #3
+ 218 0002 08D8     		bhi	.L19
+  84:Core/Src/button.c ****     {
+  85:Core/Src/button.c ****         return false;
+  86:Core/Src/button.c ****     }
+  87:Core/Src/button.c **** 
+  88:Core/Src/button.c ****     bool pressed = buttons[id].pending_press;
+ 219              		.loc 1 88 5 is_stmt 1 view .LVU51
+ 220              		.loc 1 88 10 is_stmt 0 view .LVU52
+ 221 0004 054A     		ldr	r2, .L20
+ 222 0006 00EB4001 		add	r1, r0, r0, lsl #1
+ 223 000a 02EB8101 		add	r1, r2, r1, lsl #2
+ 224 000e 087A     		ldrb	r0, [r1, #8]	@ zero_extendqisi2
+ 225              	.LVL13:
+  89:Core/Src/button.c ****     buttons[id].pending_press = false;
+ 226              		.loc 1 89 5 is_stmt 1 view .LVU53
+ 227              		.loc 1 89 31 is_stmt 0 view .LVU54
+ 228 0010 0023     		movs	r3, #0
+ 229 0012 0B72     		strb	r3, [r1, #8]
+  90:Core/Src/button.c **** 
+  91:Core/Src/button.c ****     return pressed;
+ 230              		.loc 1 91 5 is_stmt 1 view .LVU55
+ 231              		.loc 1 91 12 is_stmt 0 view .LVU56
+ 232 0014 7047     		bx	lr
+ 233              	.LVL14:
+ 234              	.L19:
+  85:Core/Src/button.c ****     }
+ 235              		.loc 1 85 16 view .LVU57
+ 236 0016 0020     		movs	r0, #0
+ 237              	.LVL15:
+  92:Core/Src/button.c **** }
+ 238              		.loc 1 92 1 view .LVU58
+ 239 0018 7047     		bx	lr
+ 240              	.L21:
+ 241 001a 00BF     		.align	2
+ 242              	.L20:
+ 243 001c 00000000 		.word	buttons
+ARM GAS  /tmp/ccWs9xbz.s 			page 7
+
+
+ 244              		.cfi_endproc
+ 245              	.LFE67:
+ 247              		.section	.data.buttons,"aw"
+ 248              		.align	2
+ 251              	buttons:
+ 252 0000 000C0140 		.word	1073810432
+ 253 0004 2000     		.short	32
+ 254 0006 00000000 		.space	6
+ 254      0000
+ 255 000c 000C0140 		.word	1073810432
+ 256 0010 4000     		.short	64
+ 257 0012 00000000 		.space	6
+ 257      0000
+ 258 0018 000C0140 		.word	1073810432
+ 259 001c 8000     		.short	128
+ 260 001e 00000000 		.space	6
+ 260      0000
+ 261 0024 000C0140 		.word	1073810432
+ 262 0028 0001     		.short	256
+ 263 002a 00000000 		.space	6
+ 263      0000
+ 264              		.text
+ 265              	.Letext0:
+ 266              		.file 2 "/usr/lib/gcc/arm-none-eabi/14.2.1/include/stdint.h"
+ 267              		.file 3 "Core/Inc/app_types.h"
+ 268              		.file 4 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 269              		.file 5 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
+ARM GAS  /tmp/ccWs9xbz.s 			page 8
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 button.c
+     /tmp/ccWs9xbz.s:19     .text.button_init:00000000 $t
+     /tmp/ccWs9xbz.s:25     .text.button_init:00000000 button_init
+     /tmp/ccWs9xbz.s:81     .text.button_init:0000002c $d
+     /tmp/ccWs9xbz.s:251    .data.buttons:00000000 buttons
+     /tmp/ccWs9xbz.s:86     .text.button_process:00000000 $t
+     /tmp/ccWs9xbz.s:92     .text.button_process:00000000 button_process
+     /tmp/ccWs9xbz.s:196    .text.button_process:00000068 $d
+     /tmp/ccWs9xbz.s:201    .text.button_take_press:00000000 $t
+     /tmp/ccWs9xbz.s:207    .text.button_take_press:00000000 button_take_press
+     /tmp/ccWs9xbz.s:243    .text.button_take_press:0000001c $d
+     /tmp/ccWs9xbz.s:248    .data.buttons:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_GPIO_ReadPin

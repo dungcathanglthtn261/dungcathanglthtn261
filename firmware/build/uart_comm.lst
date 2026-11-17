@@ -1,0 +1,406 @@
+ARM GAS  /tmp/cctMhFL1.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"uart_comm.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.file 1 "Core/Src/uart_comm.c"
+  18              		.section	.text.uart_comm_init,"ax",%progbits
+  19              		.align	1
+  20              		.global	uart_comm_init
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	uart_comm_init:
+  26              	.LFB68:
+   1:Core/Src/uart_comm.c **** #include "uart_comm.h"
+   2:Core/Src/uart_comm.c **** #include "usart.h"
+   3:Core/Src/uart_comm.c **** 
+   4:Core/Src/uart_comm.c **** #include <stdio.h>
+   5:Core/Src/uart_comm.c **** #include <stddef.h>
+   6:Core/Src/uart_comm.c **** 
+   7:Core/Src/uart_comm.c **** #define UART_TX_BUFFER_SIZE 96U
+   8:Core/Src/uart_comm.c **** 
+   9:Core/Src/uart_comm.c **** static char tx_buffer[UART_TX_BUFFER_SIZE];
+  10:Core/Src/uart_comm.c **** static volatile bool tx_busy = false;
+  11:Core/Src/uart_comm.c **** 
+  12:Core/Src/uart_comm.c **** void uart_comm_init(void)
+  13:Core/Src/uart_comm.c **** {
+  27              		.loc 1 13 1 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+  14:Core/Src/uart_comm.c ****     /* USART2 da duoc khoi tao trong main.c.
+  15:Core/Src/uart_comm.c ****        Ham nay chi goi mot lan, truoc khi gui du lieu. */
+  16:Core/Src/uart_comm.c ****     tx_busy = false;
+  32              		.loc 1 16 5 view .LVU1
+  33              		.loc 1 16 13 is_stmt 0 view .LVU2
+  34 0000 014B     		ldr	r3, .L2
+  35 0002 0022     		movs	r2, #0
+  36 0004 1A70     		strb	r2, [r3]
+  17:Core/Src/uart_comm.c **** }
+  37              		.loc 1 17 1 view .LVU3
+  38 0006 7047     		bx	lr
+  39              	.L3:
+  40              		.align	2
+  41              	.L2:
+ARM GAS  /tmp/cctMhFL1.s 			page 2
+
+
+  42 0008 00000000 		.word	tx_busy
+  43              		.cfi_endproc
+  44              	.LFE68:
+  46              		.section	.rodata.uart_comm_send_status.str1.4,"aMS",%progbits,1
+  47              		.align	2
+  48              	.LC0:
+  49 0000 4155544F 		.ascii	"AUTO\000"
+  49      00
+  50 0005 000000   		.align	2
+  51              	.LC1:
+  52 0008 4D414E55 		.ascii	"MANUAL\000"
+  52      414C00
+  53 000f 00       		.align	2
+  54              	.LC2:
+  55 0010 4F4E00   		.ascii	"ON\000"
+  56 0013 00       		.align	2
+  57              	.LC3:
+  58 0014 4F464600 		.ascii	"OFF\000"
+  59              		.align	2
+  60              	.LC4:
+  61 0018 534F494C 		.ascii	"SOIL: %u%% | SET: %u%% | MODE: %s | PUMP: %s | VALI"
+  61      3A202575 
+  61      2525207C 
+  61      20534554 
+  61      3A202575 
+  62 004b 443A2025 		.ascii	"D: %u\015\012\000"
+  62      750D0A00 
+  63              		.section	.text.uart_comm_send_status,"ax",%progbits
+  64              		.align	1
+  65              		.global	uart_comm_send_status
+  66              		.syntax unified
+  67              		.thumb
+  68              		.thumb_func
+  70              	uart_comm_send_status:
+  71              	.LVL0:
+  72              	.LFB69:
+  18:Core/Src/uart_comm.c **** 
+  19:Core/Src/uart_comm.c **** void uart_comm_send_status(const system_data_t *data)
+  20:Core/Src/uart_comm.c **** {
+  73              		.loc 1 20 1 is_stmt 1 view -0
+  74              		.cfi_startproc
+  75              		@ args = 0, pretend = 0, frame = 0
+  76              		@ frame_needed = 0, uses_anonymous_args = 0
+  21:Core/Src/uart_comm.c ****     if ((data == NULL) || tx_busy)
+  77              		.loc 1 21 5 view .LVU5
+  78              		.loc 1 21 8 is_stmt 0 view .LVU6
+  79 0000 0028     		cmp	r0, #0
+  80 0002 33D0     		beq	.L13
+  81 0004 0246     		mov	r2, r0
+  82              		.loc 1 21 24 discriminator 1 view .LVU7
+  83 0006 1A4B     		ldr	r3, .L17
+  84 0008 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  85 000a 002B     		cmp	r3, #0
+  86 000c 2ED1     		bne	.L13
+  20:Core/Src/uart_comm.c ****     if ((data == NULL) || tx_busy)
+  87              		.loc 1 20 1 view .LVU8
+  88 000e 10B5     		push	{r4, lr}
+ARM GAS  /tmp/cctMhFL1.s 			page 3
+
+
+  89              	.LCFI0:
+  90              		.cfi_def_cfa_offset 8
+  91              		.cfi_offset 4, -8
+  92              		.cfi_offset 14, -4
+  93 0010 84B0     		sub	sp, sp, #16
+  94              	.LCFI1:
+  95              		.cfi_def_cfa_offset 24
+  22:Core/Src/uart_comm.c ****     {
+  23:Core/Src/uart_comm.c ****         return;
+  24:Core/Src/uart_comm.c ****     }
+  25:Core/Src/uart_comm.c **** 
+  26:Core/Src/uart_comm.c ****     int length = snprintf(
+  96              		.loc 1 26 5 is_stmt 1 view .LVU9
+  27:Core/Src/uart_comm.c ****         tx_buffer,
+  28:Core/Src/uart_comm.c ****         sizeof(tx_buffer),
+  29:Core/Src/uart_comm.c ****         "SOIL: %u%% | SET: %u%% | MODE: %s | PUMP: %s | VALID: %u\r\n",
+  30:Core/Src/uart_comm.c ****         (unsigned int)data->soil_percent,
+  97              		.loc 1 30 27 is_stmt 0 view .LVU10
+  98 0012 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+  31:Core/Src/uart_comm.c ****         (unsigned int)data->setpoint_percent,
+  99              		.loc 1 31 27 view .LVU11
+ 100 0014 4178     		ldrb	r1, [r0, #1]	@ zero_extendqisi2
+  32:Core/Src/uart_comm.c ****         data->mode == MODE_AUTO ? "AUTO" : "MANUAL",
+ 101              		.loc 1 32 13 view .LVU12
+ 102 0016 8078     		ldrb	r0, [r0, #2]	@ zero_extendqisi2
+ 103              	.LVL1:
+  26:Core/Src/uart_comm.c ****         tx_buffer,
+ 104              		.loc 1 26 18 view .LVU13
+ 105 0018 A0B9     		cbnz	r0, .L9
+  26:Core/Src/uart_comm.c ****         tx_buffer,
+ 106              		.loc 1 26 18 discriminator 1 view .LVU14
+ 107 001a 1648     		ldr	r0, .L17+4
+ 108              	.L6:
+  33:Core/Src/uart_comm.c ****         data->pump_on ? "ON" : "OFF",
+ 109              		.loc 1 33 13 view .LVU15
+ 110 001c D478     		ldrb	r4, [r2, #3]	@ zero_extendqisi2
+  26:Core/Src/uart_comm.c ****         tx_buffer,
+ 111              		.loc 1 26 18 discriminator 4 view .LVU16
+ 112 001e 9CB1     		cbz	r4, .L10
+  26:Core/Src/uart_comm.c ****         tx_buffer,
+ 113              		.loc 1 26 18 discriminator 5 view .LVU17
+ 114 0020 154C     		ldr	r4, .L17+8
+ 115              	.L7:
+  34:Core/Src/uart_comm.c ****         data->sensor_valid ? 1U : 0U
+ 116              		.loc 1 34 13 view .LVU18
+ 117 0022 1279     		ldrb	r2, [r2, #4]	@ zero_extendqisi2
+ 118              	.LVL2:
+  26:Core/Src/uart_comm.c ****         tx_buffer,
+ 119              		.loc 1 26 18 discriminator 8 view .LVU19
+ 120 0024 92B1     		cbz	r2, .L11
+  26:Core/Src/uart_comm.c ****         tx_buffer,
+ 121              		.loc 1 26 18 discriminator 9 view .LVU20
+ 122 0026 0122     		movs	r2, #1
+ 123              	.L8:
+  26:Core/Src/uart_comm.c ****         tx_buffer,
+ 124              		.loc 1 26 18 discriminator 12 view .LVU21
+ 125 0028 0392     		str	r2, [sp, #12]
+ARM GAS  /tmp/cctMhFL1.s 			page 4
+
+
+ 126 002a 0294     		str	r4, [sp, #8]
+ 127 002c 0190     		str	r0, [sp, #4]
+ 128 002e 0091     		str	r1, [sp]
+ 129 0030 124A     		ldr	r2, .L17+12
+ 130 0032 6021     		movs	r1, #96
+ 131 0034 1248     		ldr	r0, .L17+16
+ 132 0036 FFF7FEFF 		bl	snprintf
+ 133              	.LVL3:
+  35:Core/Src/uart_comm.c ****     );
+  36:Core/Src/uart_comm.c **** 
+  37:Core/Src/uart_comm.c ****     if ((length <= 0) || ((size_t)length >= sizeof(tx_buffer)))
+ 134              		.loc 1 37 5 is_stmt 1 view .LVU22
+ 135              		.loc 1 37 23 is_stmt 0 view .LVU23
+ 136 003a 431E     		subs	r3, r0, #1
+ 137              		.loc 1 37 8 view .LVU24
+ 138 003c 5E2B     		cmp	r3, #94
+ 139 003e 07D9     		bls	.L16
+ 140              	.LVL4:
+ 141              	.L4:
+  38:Core/Src/uart_comm.c ****     {
+  39:Core/Src/uart_comm.c ****         return;
+  40:Core/Src/uart_comm.c ****     }
+  41:Core/Src/uart_comm.c **** 
+  42:Core/Src/uart_comm.c ****     tx_busy = true;
+  43:Core/Src/uart_comm.c **** 
+  44:Core/Src/uart_comm.c ****     HAL_StatusTypeDef result = HAL_UART_Transmit_IT(
+  45:Core/Src/uart_comm.c ****         &huart2,
+  46:Core/Src/uart_comm.c ****         (uint8_t *)tx_buffer,
+  47:Core/Src/uart_comm.c ****         (uint16_t)length
+  48:Core/Src/uart_comm.c ****     );
+  49:Core/Src/uart_comm.c **** 
+  50:Core/Src/uart_comm.c ****     if (result != HAL_OK)
+  51:Core/Src/uart_comm.c ****     {
+  52:Core/Src/uart_comm.c ****         tx_busy = false;
+  53:Core/Src/uart_comm.c ****     }
+  54:Core/Src/uart_comm.c **** }
+ 142              		.loc 1 54 1 view .LVU25
+ 143 0040 04B0     		add	sp, sp, #16
+ 144              	.LCFI2:
+ 145              		.cfi_remember_state
+ 146              		.cfi_def_cfa_offset 8
+ 147              		@ sp needed
+ 148 0042 10BD     		pop	{r4, pc}
+ 149              	.LVL5:
+ 150              	.L9:
+ 151              	.LCFI3:
+ 152              		.cfi_restore_state
+  26:Core/Src/uart_comm.c ****         tx_buffer,
+ 153              		.loc 1 26 18 discriminator 2 view .LVU26
+ 154 0044 0F48     		ldr	r0, .L17+20
+ 155 0046 E9E7     		b	.L6
+ 156              	.L10:
+  26:Core/Src/uart_comm.c ****         tx_buffer,
+ 157              		.loc 1 26 18 discriminator 6 view .LVU27
+ 158 0048 0F4C     		ldr	r4, .L17+24
+ 159 004a EAE7     		b	.L7
+ 160              	.LVL6:
+ARM GAS  /tmp/cctMhFL1.s 			page 5
+
+
+ 161              	.L11:
+  26:Core/Src/uart_comm.c ****         tx_buffer,
+ 162              		.loc 1 26 18 discriminator 10 view .LVU28
+ 163 004c 0022     		movs	r2, #0
+ 164 004e EBE7     		b	.L8
+ 165              	.LVL7:
+ 166              	.L16:
+  42:Core/Src/uart_comm.c **** 
+ 167              		.loc 1 42 5 is_stmt 1 view .LVU29
+  42:Core/Src/uart_comm.c **** 
+ 168              		.loc 1 42 13 is_stmt 0 view .LVU30
+ 169 0050 074B     		ldr	r3, .L17
+ 170 0052 0122     		movs	r2, #1
+ 171 0054 1A70     		strb	r2, [r3]
+  44:Core/Src/uart_comm.c ****         &huart2,
+ 172              		.loc 1 44 5 is_stmt 1 view .LVU31
+  44:Core/Src/uart_comm.c ****         &huart2,
+ 173              		.loc 1 44 32 is_stmt 0 view .LVU32
+ 174 0056 82B2     		uxth	r2, r0
+ 175 0058 0949     		ldr	r1, .L17+16
+ 176 005a 0C48     		ldr	r0, .L17+28
+ 177              	.LVL8:
+  44:Core/Src/uart_comm.c ****         &huart2,
+ 178              		.loc 1 44 32 view .LVU33
+ 179 005c FFF7FEFF 		bl	HAL_UART_Transmit_IT
+ 180              	.LVL9:
+  50:Core/Src/uart_comm.c ****     {
+ 181              		.loc 1 50 5 is_stmt 1 view .LVU34
+  50:Core/Src/uart_comm.c ****     {
+ 182              		.loc 1 50 8 is_stmt 0 view .LVU35
+ 183 0060 0028     		cmp	r0, #0
+ 184 0062 EDD0     		beq	.L4
+  52:Core/Src/uart_comm.c ****     }
+ 185              		.loc 1 52 9 is_stmt 1 view .LVU36
+  52:Core/Src/uart_comm.c ****     }
+ 186              		.loc 1 52 17 is_stmt 0 view .LVU37
+ 187 0064 024B     		ldr	r3, .L17
+ 188 0066 0022     		movs	r2, #0
+ 189 0068 1A70     		strb	r2, [r3]
+ 190 006a E9E7     		b	.L4
+ 191              	.LVL10:
+ 192              	.L13:
+ 193              	.LCFI4:
+ 194              		.cfi_def_cfa_offset 0
+ 195              		.cfi_restore 4
+ 196              		.cfi_restore 14
+  52:Core/Src/uart_comm.c ****     }
+ 197              		.loc 1 52 17 view .LVU38
+ 198 006c 7047     		bx	lr
+ 199              	.L18:
+ 200 006e 00BF     		.align	2
+ 201              	.L17:
+ 202 0070 00000000 		.word	tx_busy
+ 203 0074 00000000 		.word	.LC0
+ 204 0078 10000000 		.word	.LC2
+ 205 007c 18000000 		.word	.LC4
+ 206 0080 00000000 		.word	tx_buffer
+ARM GAS  /tmp/cctMhFL1.s 			page 6
+
+
+ 207 0084 08000000 		.word	.LC1
+ 208 0088 14000000 		.word	.LC3
+ 209 008c 00000000 		.word	huart2
+ 210              		.cfi_endproc
+ 211              	.LFE69:
+ 213              		.section	.text.HAL_UART_TxCpltCallback,"ax",%progbits
+ 214              		.align	1
+ 215              		.global	HAL_UART_TxCpltCallback
+ 216              		.syntax unified
+ 217              		.thumb
+ 218              		.thumb_func
+ 220              	HAL_UART_TxCpltCallback:
+ 221              	.LVL11:
+ 222              	.LFB70:
+  55:Core/Src/uart_comm.c **** 
+  56:Core/Src/uart_comm.c **** void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+  57:Core/Src/uart_comm.c **** {
+ 223              		.loc 1 57 1 is_stmt 1 view -0
+ 224              		.cfi_startproc
+ 225              		@ args = 0, pretend = 0, frame = 0
+ 226              		@ frame_needed = 0, uses_anonymous_args = 0
+ 227              		@ link register save eliminated.
+  58:Core/Src/uart_comm.c ****     if (huart->Instance == USART2)
+ 228              		.loc 1 58 5 view .LVU40
+ 229              		.loc 1 58 14 is_stmt 0 view .LVU41
+ 230 0000 0268     		ldr	r2, [r0]
+ 231              		.loc 1 58 8 view .LVU42
+ 232 0002 044B     		ldr	r3, .L22
+ 233 0004 9A42     		cmp	r2, r3
+ 234 0006 00D0     		beq	.L21
+ 235              	.L19:
+  59:Core/Src/uart_comm.c ****     {
+  60:Core/Src/uart_comm.c ****         tx_busy = false;
+  61:Core/Src/uart_comm.c ****     }
+  62:Core/Src/uart_comm.c **** }
+ 236              		.loc 1 62 1 view .LVU43
+ 237 0008 7047     		bx	lr
+ 238              	.L21:
+  60:Core/Src/uart_comm.c ****     }
+ 239              		.loc 1 60 9 is_stmt 1 view .LVU44
+  60:Core/Src/uart_comm.c ****     }
+ 240              		.loc 1 60 17 is_stmt 0 view .LVU45
+ 241 000a 034B     		ldr	r3, .L22+4
+ 242 000c 0022     		movs	r2, #0
+ 243 000e 1A70     		strb	r2, [r3]
+ 244              		.loc 1 62 1 view .LVU46
+ 245 0010 FAE7     		b	.L19
+ 246              	.L23:
+ 247 0012 00BF     		.align	2
+ 248              	.L22:
+ 249 0014 00440040 		.word	1073759232
+ 250 0018 00000000 		.word	tx_busy
+ 251              		.cfi_endproc
+ 252              	.LFE70:
+ 254              		.section	.bss.tx_busy,"aw",%nobits
+ 257              	tx_busy:
+ 258 0000 00       		.space	1
+ARM GAS  /tmp/cctMhFL1.s 			page 7
+
+
+ 259              		.section	.bss.tx_buffer,"aw",%nobits
+ 260              		.align	2
+ 263              	tx_buffer:
+ 264 0000 00000000 		.space	96
+ 264      00000000 
+ 264      00000000 
+ 264      00000000 
+ 264      00000000 
+ 265              		.text
+ 266              	.Letext0:
+ 267              		.file 2 "/usr/lib/gcc/arm-none-eabi/14.2.1/include/stdint.h"
+ 268              		.file 3 "Core/Inc/app_types.h"
+ 269              		.file 4 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 270              		.file 5 "/usr/lib/gcc/arm-none-eabi/14.2.1/include/stddef.h"
+ 271              		.file 6 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
+ 272              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
+ 273              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h"
+ 274              		.file 9 "/usr/include/newlib/stdio.h"
+ 275              		.file 10 "Core/Inc/usart.h"
+ARM GAS  /tmp/cctMhFL1.s 			page 8
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 uart_comm.c
+     /tmp/cctMhFL1.s:19     .text.uart_comm_init:00000000 $t
+     /tmp/cctMhFL1.s:25     .text.uart_comm_init:00000000 uart_comm_init
+     /tmp/cctMhFL1.s:42     .text.uart_comm_init:00000008 $d
+     /tmp/cctMhFL1.s:257    .bss.tx_busy:00000000 tx_busy
+     /tmp/cctMhFL1.s:47     .rodata.uart_comm_send_status.str1.4:00000000 $d
+     /tmp/cctMhFL1.s:64     .text.uart_comm_send_status:00000000 $t
+     /tmp/cctMhFL1.s:70     .text.uart_comm_send_status:00000000 uart_comm_send_status
+     /tmp/cctMhFL1.s:202    .text.uart_comm_send_status:00000070 $d
+     /tmp/cctMhFL1.s:263    .bss.tx_buffer:00000000 tx_buffer
+     /tmp/cctMhFL1.s:214    .text.HAL_UART_TxCpltCallback:00000000 $t
+     /tmp/cctMhFL1.s:220    .text.HAL_UART_TxCpltCallback:00000000 HAL_UART_TxCpltCallback
+     /tmp/cctMhFL1.s:249    .text.HAL_UART_TxCpltCallback:00000014 $d
+     /tmp/cctMhFL1.s:258    .bss.tx_busy:00000000 $d
+     /tmp/cctMhFL1.s:260    .bss.tx_buffer:00000000 $d
+
+UNDEFINED SYMBOLS
+snprintf
+HAL_UART_Transmit_IT
+huart2

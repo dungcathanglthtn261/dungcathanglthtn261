@@ -1,0 +1,562 @@
+ARM GAS  /tmp/ccSscbOA.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"lcd16x02.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.file 1 "Core/Src/lcd16x02.c"
+  18              		.section	.text.delay_us,"ax",%progbits
+  19              		.align	1
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	delay_us:
+  25              	.LVL0:
+  26              	.LFB70:
+   1:Core/Src/lcd16x02.c **** #include "lcd16x02.h"
+   2:Core/Src/lcd16x02.c **** #include "main.h"
+   3:Core/Src/lcd16x02.c **** #include "cmsis_os.h"
+   4:Core/Src/lcd16x02.c **** 
+   5:Core/Src/lcd16x02.c **** /* HD44780 16x2, che do 4-bit, RW noi GND. Chan da duoc MX_GPIO_Init() cau hinh output. */
+   6:Core/Src/lcd16x02.c **** 
+   7:Core/Src/lcd16x02.c **** static void delay_us(uint32_t us)     /* DWT: HAL_Delay chi co do phan giai 1 ms */
+   8:Core/Src/lcd16x02.c **** {
+  27              		.loc 1 8 1 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+   9:Core/Src/lcd16x02.c ****     uint32_t start = DWT->CYCCNT;
+  32              		.loc 1 9 5 view .LVU1
+  33              		.loc 1 9 14 is_stmt 0 view .LVU2
+  34 0000 074B     		ldr	r3, .L3
+  35 0002 5A68     		ldr	r2, [r3, #4]
+  36              	.LVL1:
+  10:Core/Src/lcd16x02.c ****     uint32_t ticks = us * (SystemCoreClock / 1000000U);
+  37              		.loc 1 10 5 is_stmt 1 view .LVU3
+  38              		.loc 1 10 44 is_stmt 0 view .LVU4
+  39 0004 074B     		ldr	r3, .L3+4
+  40 0006 1B68     		ldr	r3, [r3]
+  41 0008 0749     		ldr	r1, .L3+8
+  42 000a A1FB0313 		umull	r1, r3, r1, r3
+  43 000e 9B0C     		lsrs	r3, r3, #18
+  44              		.loc 1 10 14 view .LVU5
+  45 0010 03FB00F0 		mul	r0, r3, r0
+  46              	.LVL2:
+  11:Core/Src/lcd16x02.c ****     while ((DWT->CYCCNT - start) < ticks) {}
+  47              		.loc 1 11 5 is_stmt 1 view .LVU6
+ARM GAS  /tmp/ccSscbOA.s 			page 2
+
+
+  48              	.L2:
+  49              		.loc 1 11 44 discriminator 1 view .LVU7
+  50              		.loc 1 11 34 discriminator 1 view .LVU8
+  51              		.loc 1 11 16 is_stmt 0 discriminator 1 view .LVU9
+  52 0014 024B     		ldr	r3, .L3
+  53 0016 5B68     		ldr	r3, [r3, #4]
+  54              		.loc 1 11 25 discriminator 1 view .LVU10
+  55 0018 9B1A     		subs	r3, r3, r2
+  56              		.loc 1 11 34 discriminator 1 view .LVU11
+  57 001a 8342     		cmp	r3, r0
+  58 001c FAD3     		bcc	.L2
+  12:Core/Src/lcd16x02.c **** }
+  59              		.loc 1 12 1 view .LVU12
+  60 001e 7047     		bx	lr
+  61              	.L4:
+  62              		.align	2
+  63              	.L3:
+  64 0020 001000E0 		.word	-536866816
+  65 0024 00000000 		.word	SystemCoreClock
+  66 0028 83DE1B43 		.word	1125899907
+  67              		.cfi_endproc
+  68              	.LFE70:
+  70              		.section	.text.pulse,"ax",%progbits
+  71              		.align	1
+  72              		.syntax unified
+  73              		.thumb
+  74              		.thumb_func
+  76              	pulse:
+  77              	.LFB71:
+  13:Core/Src/lcd16x02.c **** 
+  14:Core/Src/lcd16x02.c **** static void pulse(void)
+  15:Core/Src/lcd16x02.c **** {
+  78              		.loc 1 15 1 is_stmt 1 view -0
+  79              		.cfi_startproc
+  80              		@ args = 0, pretend = 0, frame = 0
+  81              		@ frame_needed = 0, uses_anonymous_args = 0
+  82 0000 10B5     		push	{r4, lr}
+  83              	.LCFI0:
+  84              		.cfi_def_cfa_offset 8
+  85              		.cfi_offset 4, -8
+  86              		.cfi_offset 14, -4
+  16:Core/Src/lcd16x02.c ****     HAL_GPIO_WritePin(LCD_EN_GPIO_Port, LCD_EN_Pin, GPIO_PIN_SET);   delay_us(2U);
+  87              		.loc 1 16 5 view .LVU14
+  88 0002 094C     		ldr	r4, .L7
+  89 0004 0122     		movs	r2, #1
+  90 0006 0221     		movs	r1, #2
+  91 0008 2046     		mov	r0, r4
+  92 000a FFF7FEFF 		bl	HAL_GPIO_WritePin
+  93              	.LVL3:
+  94              		.loc 1 16 70 discriminator 1 view .LVU15
+  95 000e 0220     		movs	r0, #2
+  96 0010 FFF7FEFF 		bl	delay_us
+  97              	.LVL4:
+  17:Core/Src/lcd16x02.c ****     HAL_GPIO_WritePin(LCD_EN_GPIO_Port, LCD_EN_Pin, GPIO_PIN_RESET); delay_us(50U);
+  98              		.loc 1 17 5 view .LVU16
+  99 0014 0022     		movs	r2, #0
+ 100 0016 0221     		movs	r1, #2
+ARM GAS  /tmp/ccSscbOA.s 			page 3
+
+
+ 101 0018 2046     		mov	r0, r4
+ 102 001a FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 103              	.LVL5:
+ 104              		.loc 1 17 70 discriminator 1 view .LVU17
+ 105 001e 3220     		movs	r0, #50
+ 106 0020 FFF7FEFF 		bl	delay_us
+ 107              	.LVL6:
+  18:Core/Src/lcd16x02.c **** }
+ 108              		.loc 1 18 1 is_stmt 0 view .LVU18
+ 109 0024 10BD     		pop	{r4, pc}
+ 110              	.L8:
+ 111 0026 00BF     		.align	2
+ 112              	.L7:
+ 113 0028 000C0140 		.word	1073810432
+ 114              		.cfi_endproc
+ 115              	.LFE71:
+ 117              		.section	.text.write4,"ax",%progbits
+ 118              		.align	1
+ 119              		.syntax unified
+ 120              		.thumb
+ 121              		.thumb_func
+ 123              	write4:
+ 124              	.LVL7:
+ 125              	.LFB72:
+  19:Core/Src/lcd16x02.c **** 
+  20:Core/Src/lcd16x02.c **** static void write4(uint8_t n)
+  21:Core/Src/lcd16x02.c **** {
+ 126              		.loc 1 21 1 is_stmt 1 view -0
+ 127              		.cfi_startproc
+ 128              		@ args = 0, pretend = 0, frame = 0
+ 129              		@ frame_needed = 0, uses_anonymous_args = 0
+ 130              		.loc 1 21 1 is_stmt 0 view .LVU20
+ 131 0000 38B5     		push	{r3, r4, r5, lr}
+ 132              	.LCFI1:
+ 133              		.cfi_def_cfa_offset 16
+ 134              		.cfi_offset 3, -16
+ 135              		.cfi_offset 4, -12
+ 136              		.cfi_offset 5, -8
+ 137              		.cfi_offset 14, -4
+ 138 0002 0446     		mov	r4, r0
+  22:Core/Src/lcd16x02.c ****     HAL_GPIO_WritePin(LCD_D4_GPIO_Port, LCD_D4_Pin, (n & 1U) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+ 139              		.loc 1 22 5 is_stmt 1 view .LVU21
+ 140 0004 0F4D     		ldr	r5, .L11
+ 141 0006 00F00102 		and	r2, r0, #1
+ 142 000a 4FF48061 		mov	r1, #1024
+ 143 000e 2846     		mov	r0, r5
+ 144              	.LVL8:
+ 145              		.loc 1 22 5 is_stmt 0 view .LVU22
+ 146 0010 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 147              	.LVL9:
+  23:Core/Src/lcd16x02.c ****     HAL_GPIO_WritePin(LCD_D5_GPIO_Port, LCD_D5_Pin, (n & 2U) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+ 148              		.loc 1 23 5 is_stmt 1 view .LVU23
+ 149 0014 C4F34002 		ubfx	r2, r4, #1, #1
+ 150 0018 4FF40061 		mov	r1, #2048
+ 151 001c 2846     		mov	r0, r5
+ 152 001e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 153              	.LVL10:
+ARM GAS  /tmp/ccSscbOA.s 			page 4
+
+
+  24:Core/Src/lcd16x02.c ****     HAL_GPIO_WritePin(LCD_D6_GPIO_Port, LCD_D6_Pin, (n & 4U) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+ 154              		.loc 1 24 5 view .LVU24
+ 155 0022 C4F38002 		ubfx	r2, r4, #2, #1
+ 156 0026 4FF48051 		mov	r1, #4096
+ 157 002a 2846     		mov	r0, r5
+ 158 002c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 159              	.LVL11:
+  25:Core/Src/lcd16x02.c ****     HAL_GPIO_WritePin(LCD_D7_GPIO_Port, LCD_D7_Pin, (n & 8U) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+ 160              		.loc 1 25 5 view .LVU25
+ 161 0030 C4F3C002 		ubfx	r2, r4, #3, #1
+ 162 0034 4FF40051 		mov	r1, #8192
+ 163 0038 2846     		mov	r0, r5
+ 164 003a FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 165              	.LVL12:
+  26:Core/Src/lcd16x02.c ****     pulse();
+ 166              		.loc 1 26 5 view .LVU26
+ 167 003e FFF7FEFF 		bl	pulse
+ 168              	.LVL13:
+  27:Core/Src/lcd16x02.c **** }
+ 169              		.loc 1 27 1 is_stmt 0 view .LVU27
+ 170 0042 38BD     		pop	{r3, r4, r5, pc}
+ 171              	.LVL14:
+ 172              	.L12:
+ 173              		.loc 1 27 1 view .LVU28
+ 174              		.align	2
+ 175              	.L11:
+ 176 0044 000C0140 		.word	1073810432
+ 177              		.cfi_endproc
+ 178              	.LFE72:
+ 180              		.section	.text.write8,"ax",%progbits
+ 181              		.align	1
+ 182              		.syntax unified
+ 183              		.thumb
+ 184              		.thumb_func
+ 186              	write8:
+ 187              	.LVL15:
+ 188              	.LFB73:
+  28:Core/Src/lcd16x02.c **** 
+  29:Core/Src/lcd16x02.c **** static void write8(uint8_t v, GPIO_PinState rs)
+  30:Core/Src/lcd16x02.c **** {
+ 189              		.loc 1 30 1 is_stmt 1 view -0
+ 190              		.cfi_startproc
+ 191              		@ args = 0, pretend = 0, frame = 0
+ 192              		@ frame_needed = 0, uses_anonymous_args = 0
+ 193              		.loc 1 30 1 is_stmt 0 view .LVU30
+ 194 0000 10B5     		push	{r4, lr}
+ 195              	.LCFI2:
+ 196              		.cfi_def_cfa_offset 8
+ 197              		.cfi_offset 4, -8
+ 198              		.cfi_offset 14, -4
+ 199 0002 0446     		mov	r4, r0
+ 200 0004 0A46     		mov	r2, r1
+  31:Core/Src/lcd16x02.c ****     HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, rs);
+ 201              		.loc 1 31 5 is_stmt 1 view .LVU31
+ 202 0006 0121     		movs	r1, #1
+ 203              	.LVL16:
+ 204              		.loc 1 31 5 is_stmt 0 view .LVU32
+ARM GAS  /tmp/ccSscbOA.s 			page 5
+
+
+ 205 0008 0548     		ldr	r0, .L15
+ 206              	.LVL17:
+ 207              		.loc 1 31 5 view .LVU33
+ 208 000a FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 209              	.LVL18:
+  32:Core/Src/lcd16x02.c ****     write4(v >> 4);
+ 210              		.loc 1 32 5 is_stmt 1 view .LVU34
+ 211 000e 2009     		lsrs	r0, r4, #4
+ 212 0010 FFF7FEFF 		bl	write4
+ 213              	.LVL19:
+  33:Core/Src/lcd16x02.c ****     write4(v & 0x0FU);
+ 214              		.loc 1 33 5 view .LVU35
+ 215 0014 04F00F00 		and	r0, r4, #15
+ 216 0018 FFF7FEFF 		bl	write4
+ 217              	.LVL20:
+  34:Core/Src/lcd16x02.c **** }
+ 218              		.loc 1 34 1 is_stmt 0 view .LVU36
+ 219 001c 10BD     		pop	{r4, pc}
+ 220              	.LVL21:
+ 221              	.L16:
+ 222              		.loc 1 34 1 view .LVU37
+ 223 001e 00BF     		.align	2
+ 224              	.L15:
+ 225 0020 000C0140 		.word	1073810432
+ 226              		.cfi_endproc
+ 227              	.LFE73:
+ 229              		.section	.text.lcd16x02_init,"ax",%progbits
+ 230              		.align	1
+ 231              		.global	lcd16x02_init
+ 232              		.syntax unified
+ 233              		.thumb
+ 234              		.thumb_func
+ 236              	lcd16x02_init:
+ 237              	.LFB74:
+  35:Core/Src/lcd16x02.c **** 
+  36:Core/Src/lcd16x02.c **** /* Goi trong task (sau khi scheduler chay) nen dung osDelay, khong dung HAL_Delay. */
+  37:Core/Src/lcd16x02.c **** void lcd16x02_init(void)
+  38:Core/Src/lcd16x02.c **** {
+ 238              		.loc 1 38 1 is_stmt 1 view -0
+ 239              		.cfi_startproc
+ 240              		@ args = 0, pretend = 0, frame = 0
+ 241              		@ frame_needed = 0, uses_anonymous_args = 0
+ 242 0000 10B5     		push	{r4, lr}
+ 243              	.LCFI3:
+ 244              		.cfi_def_cfa_offset 8
+ 245              		.cfi_offset 4, -8
+ 246              		.cfi_offset 14, -4
+  39:Core/Src/lcd16x02.c ****     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+ 247              		.loc 1 39 5 view .LVU39
+ 248              		.loc 1 39 14 is_stmt 0 view .LVU40
+ 249 0002 1F4A     		ldr	r2, .L19
+ 250 0004 D2F8FC30 		ldr	r3, [r2, #252]
+ 251              		.loc 1 39 22 view .LVU41
+ 252 0008 43F08073 		orr	r3, r3, #16777216
+ 253 000c C2F8FC30 		str	r3, [r2, #252]
+  40:Core/Src/lcd16x02.c ****     DWT->CYCCNT = 0U;
+ 254              		.loc 1 40 5 is_stmt 1 view .LVU42
+ARM GAS  /tmp/ccSscbOA.s 			page 6
+
+
+ 255              		.loc 1 40 17 is_stmt 0 view .LVU43
+ 256 0010 1C4B     		ldr	r3, .L19+4
+ 257 0012 0024     		movs	r4, #0
+ 258 0014 5C60     		str	r4, [r3, #4]
+  41:Core/Src/lcd16x02.c ****     DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+ 259              		.loc 1 41 5 is_stmt 1 view .LVU44
+ 260              		.loc 1 41 8 is_stmt 0 view .LVU45
+ 261 0016 1A68     		ldr	r2, [r3]
+ 262              		.loc 1 41 15 view .LVU46
+ 263 0018 42F00102 		orr	r2, r2, #1
+ 264 001c 1A60     		str	r2, [r3]
+  42:Core/Src/lcd16x02.c **** 
+  43:Core/Src/lcd16x02.c ****     osDelay(50);
+ 265              		.loc 1 43 5 is_stmt 1 view .LVU47
+ 266 001e 3220     		movs	r0, #50
+ 267 0020 FFF7FEFF 		bl	osDelay
+ 268              	.LVL22:
+  44:Core/Src/lcd16x02.c ****     HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_RESET);
+ 269              		.loc 1 44 5 view .LVU48
+ 270 0024 2246     		mov	r2, r4
+ 271 0026 0121     		movs	r1, #1
+ 272 0028 1748     		ldr	r0, .L19+8
+ 273 002a FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 274              	.LVL23:
+  45:Core/Src/lcd16x02.c ****     write4(0x3U); osDelay(5);
+ 275              		.loc 1 45 5 view .LVU49
+ 276 002e 0320     		movs	r0, #3
+ 277 0030 FFF7FEFF 		bl	write4
+ 278              	.LVL24:
+ 279              		.loc 1 45 19 discriminator 1 view .LVU50
+ 280 0034 0520     		movs	r0, #5
+ 281 0036 FFF7FEFF 		bl	osDelay
+ 282              	.LVL25:
+  46:Core/Src/lcd16x02.c ****     write4(0x3U); delay_us(200U);
+ 283              		.loc 1 46 5 view .LVU51
+ 284 003a 0320     		movs	r0, #3
+ 285 003c FFF7FEFF 		bl	write4
+ 286              	.LVL26:
+ 287              		.loc 1 46 19 discriminator 1 view .LVU52
+ 288 0040 C820     		movs	r0, #200
+ 289 0042 FFF7FEFF 		bl	delay_us
+ 290              	.LVL27:
+  47:Core/Src/lcd16x02.c ****     write4(0x3U); delay_us(200U);
+ 291              		.loc 1 47 5 view .LVU53
+ 292 0046 0320     		movs	r0, #3
+ 293 0048 FFF7FEFF 		bl	write4
+ 294              	.LVL28:
+ 295              		.loc 1 47 19 discriminator 1 view .LVU54
+ 296 004c C820     		movs	r0, #200
+ 297 004e FFF7FEFF 		bl	delay_us
+ 298              	.LVL29:
+  48:Core/Src/lcd16x02.c ****     write4(0x2U);                       /* chuyen sang 4-bit */
+ 299              		.loc 1 48 5 view .LVU55
+ 300 0052 0220     		movs	r0, #2
+ 301 0054 FFF7FEFF 		bl	write4
+ 302              	.LVL30:
+  49:Core/Src/lcd16x02.c ****     write8(0x28U, GPIO_PIN_RESET);      /* 4-bit, 2 dong, 5x8 */
+ARM GAS  /tmp/ccSscbOA.s 			page 7
+
+
+ 303              		.loc 1 49 5 view .LVU56
+ 304 0058 2146     		mov	r1, r4
+ 305 005a 2820     		movs	r0, #40
+ 306 005c FFF7FEFF 		bl	write8
+ 307              	.LVL31:
+  50:Core/Src/lcd16x02.c ****     write8(0x0CU, GPIO_PIN_RESET);      /* display ON, khong con tro */
+ 308              		.loc 1 50 5 view .LVU57
+ 309 0060 2146     		mov	r1, r4
+ 310 0062 0C20     		movs	r0, #12
+ 311 0064 FFF7FEFF 		bl	write8
+ 312              	.LVL32:
+  51:Core/Src/lcd16x02.c ****     write8(0x06U, GPIO_PIN_RESET);      /* tang dia chi */
+ 313              		.loc 1 51 5 view .LVU58
+ 314 0068 2146     		mov	r1, r4
+ 315 006a 0620     		movs	r0, #6
+ 316 006c FFF7FEFF 		bl	write8
+ 317              	.LVL33:
+  52:Core/Src/lcd16x02.c ****     write8(0x01U, GPIO_PIN_RESET);      /* xoa man hinh */
+ 318              		.loc 1 52 5 view .LVU59
+ 319 0070 2146     		mov	r1, r4
+ 320 0072 0120     		movs	r0, #1
+ 321 0074 FFF7FEFF 		bl	write8
+ 322              	.LVL34:
+  53:Core/Src/lcd16x02.c ****     osDelay(2);
+ 323              		.loc 1 53 5 view .LVU60
+ 324 0078 0220     		movs	r0, #2
+ 325 007a FFF7FEFF 		bl	osDelay
+ 326              	.LVL35:
+  54:Core/Src/lcd16x02.c **** }
+ 327              		.loc 1 54 1 is_stmt 0 view .LVU61
+ 328 007e 10BD     		pop	{r4, pc}
+ 329              	.L20:
+ 330              		.align	2
+ 331              	.L19:
+ 332 0080 00ED00E0 		.word	-536810240
+ 333 0084 001000E0 		.word	-536866816
+ 334 0088 000C0140 		.word	1073810432
+ 335              		.cfi_endproc
+ 336              	.LFE74:
+ 338              		.section	.text.lcd16x02_write_line,"ax",%progbits
+ 339              		.align	1
+ 340              		.global	lcd16x02_write_line
+ 341              		.syntax unified
+ 342              		.thumb
+ 343              		.thumb_func
+ 345              	lcd16x02_write_line:
+ 346              	.LVL36:
+ 347              	.LFB75:
+  55:Core/Src/lcd16x02.c **** 
+  56:Core/Src/lcd16x02.c **** void lcd16x02_write_line(uint8_t row, const char *text)
+  57:Core/Src/lcd16x02.c **** {
+ 348              		.loc 1 57 1 is_stmt 1 view -0
+ 349              		.cfi_startproc
+ 350              		@ args = 0, pretend = 0, frame = 0
+ 351              		@ frame_needed = 0, uses_anonymous_args = 0
+ 352              		.loc 1 57 1 is_stmt 0 view .LVU63
+ 353 0000 38B5     		push	{r3, r4, r5, lr}
+ARM GAS  /tmp/ccSscbOA.s 			page 8
+
+
+ 354              	.LCFI4:
+ 355              		.cfi_def_cfa_offset 16
+ 356              		.cfi_offset 3, -16
+ 357              		.cfi_offset 4, -12
+ 358              		.cfi_offset 5, -8
+ 359              		.cfi_offset 14, -4
+ 360 0002 0D46     		mov	r5, r1
+  58:Core/Src/lcd16x02.c ****     write8(0x80U | (row ? 0x40U : 0x00U), GPIO_PIN_RESET);
+ 361              		.loc 1 58 5 is_stmt 1 view .LVU64
+ 362 0004 28B1     		cbz	r0, .L26
+ 363              		.loc 1 58 5 is_stmt 0 discriminator 1 view .LVU65
+ 364 0006 C020     		movs	r0, #192
+ 365              	.LVL37:
+ 366              	.L22:
+ 367              		.loc 1 58 5 discriminator 4 view .LVU66
+ 368 0008 0021     		movs	r1, #0
+ 369              	.LVL38:
+ 370              		.loc 1 58 5 discriminator 4 view .LVU67
+ 371 000a FFF7FEFF 		bl	write8
+ 372              	.LVL39:
+  59:Core/Src/lcd16x02.c ****     for (uint32_t i = 0U; i < 16U; i++)
+ 373              		.loc 1 59 5 is_stmt 1 view .LVU68
+ 374              	.LBB2:
+ 375              		.loc 1 59 10 view .LVU69
+ 376              		.loc 1 59 19 is_stmt 0 view .LVU70
+ 377 000e 0024     		movs	r4, #0
+ 378              		.loc 1 59 5 view .LVU71
+ 379 0010 08E0     		b	.L23
+ 380              	.LVL40:
+ 381              	.L26:
+ 382              		.loc 1 59 5 view .LVU72
+ 383              	.LBE2:
+  58:Core/Src/lcd16x02.c ****     write8(0x80U | (row ? 0x40U : 0x00U), GPIO_PIN_RESET);
+ 384              		.loc 1 58 5 discriminator 2 view .LVU73
+ 385 0012 8020     		movs	r0, #128
+ 386              	.LVL41:
+  58:Core/Src/lcd16x02.c ****     write8(0x80U | (row ? 0x40U : 0x00U), GPIO_PIN_RESET);
+ 387              		.loc 1 58 5 discriminator 2 view .LVU74
+ 388 0014 F8E7     		b	.L22
+ 389              	.LVL42:
+ 390              	.L27:
+ 391              	.LBB5:
+ 392              	.LBB3:
+  60:Core/Src/lcd16x02.c ****     {
+  61:Core/Src/lcd16x02.c ****         char c = ((text != NULL) && (*text != '\0')) ? *text++ : ' ';
+ 393              		.loc 1 61 14 discriminator 4 view .LVU75
+ 394 0016 2020     		movs	r0, #32
+ 395 0018 00E0     		b	.L24
+ 396              	.L28:
+ 397 001a 2020     		movs	r0, #32
+ 398              	.L24:
+ 399              	.LVL43:
+  62:Core/Src/lcd16x02.c ****         write8((uint8_t)c, GPIO_PIN_SET);
+ 400              		.loc 1 62 9 is_stmt 1 view .LVU76
+ 401 001c 0121     		movs	r1, #1
+ 402 001e FFF7FEFF 		bl	write8
+ 403              	.LVL44:
+ARM GAS  /tmp/ccSscbOA.s 			page 9
+
+
+ 404              		.loc 1 62 9 is_stmt 0 view .LVU77
+ 405              	.LBE3:
+  59:Core/Src/lcd16x02.c ****     for (uint32_t i = 0U; i < 16U; i++)
+ 406              		.loc 1 59 37 is_stmt 1 discriminator 2 view .LVU78
+ 407 0022 0134     		adds	r4, r4, #1
+ 408              	.LVL45:
+ 409              	.L23:
+  59:Core/Src/lcd16x02.c ****     for (uint32_t i = 0U; i < 16U; i++)
+ 410              		.loc 1 59 29 discriminator 1 view .LVU79
+ 411 0024 0F2C     		cmp	r4, #15
+ 412 0026 06D8     		bhi	.L30
+ 413              	.LBB4:
+  61:Core/Src/lcd16x02.c ****         write8((uint8_t)c, GPIO_PIN_SET);
+ 414              		.loc 1 61 9 view .LVU80
+  61:Core/Src/lcd16x02.c ****         write8((uint8_t)c, GPIO_PIN_SET);
+ 415              		.loc 1 61 14 is_stmt 0 view .LVU81
+ 416 0028 002D     		cmp	r5, #0
+ 417 002a F4D0     		beq	.L27
+  61:Core/Src/lcd16x02.c ****         write8((uint8_t)c, GPIO_PIN_SET);
+ 418              		.loc 1 61 38 discriminator 1 view .LVU82
+ 419 002c 2878     		ldrb	r0, [r5]	@ zero_extendqisi2
+  61:Core/Src/lcd16x02.c ****         write8((uint8_t)c, GPIO_PIN_SET);
+ 420              		.loc 1 61 34 discriminator 1 view .LVU83
+ 421 002e 0028     		cmp	r0, #0
+ 422 0030 F3D0     		beq	.L28
+  61:Core/Src/lcd16x02.c ****         write8((uint8_t)c, GPIO_PIN_SET);
+ 423              		.loc 1 61 61 discriminator 3 view .LVU84
+ 424 0032 0135     		adds	r5, r5, #1
+ 425              	.LVL46:
+  61:Core/Src/lcd16x02.c ****         write8((uint8_t)c, GPIO_PIN_SET);
+ 426              		.loc 1 61 14 view .LVU85
+ 427 0034 F2E7     		b	.L24
+ 428              	.L30:
+  61:Core/Src/lcd16x02.c ****         write8((uint8_t)c, GPIO_PIN_SET);
+ 429              		.loc 1 61 14 view .LVU86
+ 430              	.LBE4:
+ 431              	.LBE5:
+  63:Core/Src/lcd16x02.c ****     }
+  64:Core/Src/lcd16x02.c **** }
+ 432              		.loc 1 64 1 view .LVU87
+ 433 0036 38BD     		pop	{r3, r4, r5, pc}
+ 434              		.loc 1 64 1 view .LVU88
+ 435              		.cfi_endproc
+ 436              	.LFE75:
+ 438              		.text
+ 439              	.Letext0:
+ 440              		.file 2 "/usr/lib/gcc/arm-none-eabi/14.2.1/include/stdint.h"
+ 441              		.file 3 "Drivers/CMSIS/Include/core_cm3.h"
+ 442              		.file 4 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 443              		.file 5 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
+ 444              		.file 6 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h"
+ 445              		.file 7 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
+ARM GAS  /tmp/ccSscbOA.s 			page 10
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 lcd16x02.c
+     /tmp/ccSscbOA.s:19     .text.delay_us:00000000 $t
+     /tmp/ccSscbOA.s:24     .text.delay_us:00000000 delay_us
+     /tmp/ccSscbOA.s:64     .text.delay_us:00000020 $d
+     /tmp/ccSscbOA.s:71     .text.pulse:00000000 $t
+     /tmp/ccSscbOA.s:76     .text.pulse:00000000 pulse
+     /tmp/ccSscbOA.s:113    .text.pulse:00000028 $d
+     /tmp/ccSscbOA.s:118    .text.write4:00000000 $t
+     /tmp/ccSscbOA.s:123    .text.write4:00000000 write4
+     /tmp/ccSscbOA.s:176    .text.write4:00000044 $d
+     /tmp/ccSscbOA.s:181    .text.write8:00000000 $t
+     /tmp/ccSscbOA.s:186    .text.write8:00000000 write8
+     /tmp/ccSscbOA.s:225    .text.write8:00000020 $d
+     /tmp/ccSscbOA.s:230    .text.lcd16x02_init:00000000 $t
+     /tmp/ccSscbOA.s:236    .text.lcd16x02_init:00000000 lcd16x02_init
+     /tmp/ccSscbOA.s:332    .text.lcd16x02_init:00000080 $d
+     /tmp/ccSscbOA.s:339    .text.lcd16x02_write_line:00000000 $t
+     /tmp/ccSscbOA.s:345    .text.lcd16x02_write_line:00000000 lcd16x02_write_line
+
+UNDEFINED SYMBOLS
+SystemCoreClock
+HAL_GPIO_WritePin
+osDelay
