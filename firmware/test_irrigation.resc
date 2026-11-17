@@ -1,0 +1,33 @@
+# Kiem thu tu dong: renode --console --disable-gui -e "include @test_irrigation.resc"
+mach create "irrigation"
+machine LoadPlatformDescription @irrigation.repl
+sysbus LoadELF @build/Project.elf
+sysbus.cpu PerformanceInMips 72
+logLevel 3
+logLevel -1 sysbus.gpioPortA.relay
+logLevel 0 sysbus.usart2
+showAnalyzer sysbus.usart2 Antmicro.Renode.Analyzers.LoggingUartAnalyzer
+emulation RunFor "2.5"
+echo "=== dry (raw 2500): relay"
+sysbus.gpioPortA.relay State
+sysbus ReadByte `sysbus GetSymbolAddress "g_system_data"`
+sysbus WriteDoubleWord 0x400127FC 1300
+emulation RunFor "1.5"
+echo "=== wet (raw 1300): relay"
+sysbus.gpioPortA.relay State
+sysbus ReadByte `sysbus GetSymbolAddress "g_system_data"`
+# Nut keo len: chan o muc cao = nha; ha xuong thap = nhan (MODE=PB5, PUMP=PB8)
+sysbus.gpioPortB OnGPIO 5 true
+sysbus.gpioPortB OnGPIO 8 true
+emulation RunFor "0.2"
+sysbus.gpioPortB OnGPIO 5 false
+emulation RunFor "0.2"
+sysbus.gpioPortB OnGPIO 5 true
+sysbus.gpioPortB OnGPIO 8 false
+emulation RunFor "0.2"
+sysbus.gpioPortB OnGPIO 8 true
+emulation RunFor "0.2"
+emulation RunFor "1"
+echo "=== MODE roi PUMP: dong usart2 cuoi phai la MODE: MANUAL | PUMP: ON; relay:"
+sysbus.gpioPortA.relay State
+quit

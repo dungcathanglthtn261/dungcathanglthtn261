@@ -21,7 +21,8 @@ Nhóm: Dũng · Ca · Thắng
 docs/                Đề tài, yêu cầu chung, bảng phân công, sơ đồ khối
 hardware/kicad/      Project KiCad: schematic, PCB 10x10 cm, thư viện symbol/footprint riêng
 hardware/images/     Ảnh xem nhanh schematic và PCB
-firmware/            Code STM32 + FreeRTOS: app/ (task, logic), middleware/ (soil_sensor, lcd16x02, relay_pump)
+firmware/            Project STM32CubeMX + FreeRTOS (SmartIrrigation.ioc, Makefile), code trong Core/Src, Core/Inc
+firmware/*.resc     Mô phỏng firmware trên Renode
 docs/test/           Kịch bản kiểm thử
 docs/flowcharts/     Lưu đồ giải thuật (mermaid + png)
 simulation/mokxi/    diagram.json (định dạng Wokwi) + sketch.ino để mô phỏng trên Mokxi/Wokwi
@@ -52,6 +53,20 @@ riêng đã khai báo trong `sym-lib-table` / `fp-lib-table` của project (đư
 **Cần kiểm tra trước khi đặt mạch:** in PCB tỉ lệ 1:1 để ướm Blue Pill thật (pinout, khoảng
 cách hàng, chiều USB) và hướng lỗ luồn dây của cầu đấu vít.
 
+## Firmware
+
+```
+cd firmware && make          # -> build/Project.elf, .hex, .bin (arm-none-eabi-gcc)
+```
+
+5 task FreeRTOS: SensorRead 1000 ms, ButtonProcess 20 ms, Control 100 ms, Display 200 ms, UART_Tx 1000 ms.
+Module: `soil_sensor`, `button`, `irrigation_control`, `relay_pump`, `lcd16x02`, `uart_comm`; hằng số trong `app_config.h`.
+
+Chạy trên Renode (trong `firmware/`, sau khi `make`):
+
+- `renode irrigation.resc`: chạy tương tác, mở cửa sổ USART2, GDB server cổng 3333.
+- `renode --console --disable-gui -e "include @test_irrigation.resc"`: kiểm thử tự động (khô/ướt → relay, nút MODE/PUMP).
+
 ## Mô phỏng
 
 Ubuntu không chạy được Proteus, nhóm dùng **Mokxi** (mô phỏng trên trình duyệt):
@@ -68,7 +83,7 @@ Hằng số `ADC_DRY` / `ADC_WET` trong code phải hiệu chuẩn lại trên m
 
 ## Việc tiếp theo
 
-- [ ] Firmware STM32CubeIDE + FreeRTOS (5 task: SensorRead, ButtonProcess, Control, Display, UART_Tx)
+- [x] Firmware STM32CubeMX + FreeRTOS (5 task: SensorRead, ButtonProcess, Control, Display, UART_Tx)
 - [ ] Xuất Gerber, làm mạch, hàn linh kiện
 - [ ] Hiệu chuẩn cảm biến, chạy kịch bản kiểm thử
 - [ ] Báo cáo
