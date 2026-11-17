@@ -1,7 +1,11 @@
 flowchart TD
-  A([Task_Display<br/>chu kỳ 200 ms]) --> B[Khóa mutex, sao chép dữ liệu, mở mutex]
-  B --> C["Dòng 1: SOIL xx% SET yy%"]
+  A([Task_Display<br/>chu kỳ 200 ms]) --> A1[Khởi tạo LCD 16x2 4-bit<br/>hiện 'Smart Irrigation' 0.8 s]
+  A1 --> B[Khóa mutex, sao chép dữ liệu, mở mutex]
+  B --> V{sensor_valid?}
+  V -- Có --> C["Dòng 1: SOIL xx% SET yy%"]
+  V -- Không --> C2["Dòng 1: SOIL ERR SET yy%"]
   C --> D["Dòng 2: AUTO/MAN  PUMP:ON/OFF"]
+  C2 --> D
   D --> E[Ghi 2 dòng lên LCD 16x2]
-  E --> F[vTaskDelayUntil 200 ms]
+  E --> F[osDelay 200 ms]
   F --> B

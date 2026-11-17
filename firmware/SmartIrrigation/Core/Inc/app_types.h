@@ -14,7 +14,9 @@
 typedef enum
 {
     MODE_AUTO = 0,
-    MODE_MANUAL
+    MODE_MANUAL,
+    MODE_IDLE,      /* vua khoi dong, chua co so do hop le */
+    MODE_ERROR      /* AUTO nhung mat cam bien: tat bom */
 } system_mode_t;
 
 typedef enum

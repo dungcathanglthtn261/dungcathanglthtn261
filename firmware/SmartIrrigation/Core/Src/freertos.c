@@ -33,6 +33,7 @@
 #include "lcd16x02.h"
 #include "uart_comm.h"
 #include "irrigation_control.h"
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,6 +54,8 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 volatile uint32_t g_button_press_count[BUTTON_COUNT] = {0U};
+/* Lenh UART = nut ao; chi ISR UART (uart_comm.c) ghi, tach rieng de khong tranh ghi voi task Button. */
+volatile uint32_t g_uart_press_count[BUTTON_COUNT] = {0U};
 system_data_t g_system_data =
 {
     .soil_percent = 0U,
@@ -138,15 +141,15 @@ void MX_FREERTOS_Init(void) {
   sensorTaskHandle = osThreadCreate(osThread(sensorTask), NULL);
 
   /* definition and creation of controlTask */
-  osThreadDef(controlTask, StartcontrolTask, osPriorityNormal, 0, 128);
+  osThreadDef(controlTask, StartcontrolTask, osPriorityAboveNormal, 0, 128);
   controlTaskHandle = osThreadCreate(osThread(controlTask), NULL);
 
   /* definition and creation of displayTask */
-  osThreadDef(displayTask, StartdisplayTask, osPriorityNormal, 0, 128);
+  osThreadDef(displayTask, StartdisplayTask, osPriorityBelowNormal, 0, 384);
   displayTaskHandle = osThreadCreate(osThread(displayTask), NULL);
 
   /* definition and creation of uartTask */
-  osThreadDef(uartTask, StartuartTask, osPriorityNormal, 0, 384);
+  osThreadDef(uartTask, StartuartTask, osPriorityBelowNormal, 0, 384);
   uartTaskHandle = osThreadCreate(osThread(uartTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -194,10 +197,21 @@ void StartbuttonTask(void const * argument)
 void StartsensorTask(void const * argument)
 {
   /* USER CODE BEGIN StartsensorTask */
+  soil_sensor_init();
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1000);
+    uint8_t percent = 0U;
+    bool ok = soil_sensor_read_percent(&percent);   /* doc ADC ngoai mutex cho ngan */
+
+    if (osMutexWait(systemDataMutexHandle, osWaitForever) == osOK)
+    {
+      if (ok) { g_system_data.soil_percent = percent; }
+      g_system_data.sensor_valid = ok;
+      osMutexRelease(systemDataMutexHandle);
+    }
+
+    osDelay(SENSOR_PERIOD_MS);
   }
   /* USER CODE END StartsensorTask */
 }
@@ -212,10 +226,38 @@ void StartsensorTask(void const * argument)
 void StartcontrolTask(void const * argument)
 {
   /* USER CODE BEGIN StartcontrolTask */
+  uint32_t handled[BUTTON_COUNT] = {0U};
+  uint32_t handled_uart[BUTTON_COUNT] = {0U};
+
+  if (osMutexWait(systemDataMutexHandle, osWaitForever) == osOK)
+  {
+    irrigation_control_init(&g_system_data);
+    osMutexRelease(systemDataMutexHandle);
+  }
   /* Infinite loop */
   for(;;)
   {
-    osDelay(100);
+    if (osMutexWait(systemDataMutexHandle, osWaitForever) == osOK)
+    {
+      /* So lan nhan do task Button dem; xu ly phan chenh lech. */
+      for (uint32_t i = 0U; i < BUTTON_COUNT; i++)
+      {
+        while (handled[i] != g_button_press_count[i])
+        {
+          handled[i]++;
+          irrigation_control_handle_button(&g_system_data, (button_id_t)i);
+        }
+        while (handled_uart[i] != g_uart_press_count[i])
+        {
+          handled_uart[i]++;
+          irrigation_control_handle_button(&g_system_data, (button_id_t)i);
+        }
+      }
+      irrigation_control_update(&g_system_data);
+      osMutexRelease(systemDataMutexHandle);
+    }
+
+    osDelay(CONTROL_PERIOD_MS);
   }
   /* USER CODE END StartcontrolTask */
 }
@@ -230,10 +272,36 @@ void StartcontrolTask(void const * argument)
 void StartdisplayTask(void const * argument)
 {
   /* USER CODE BEGIN StartdisplayTask */
+  static const char *const MODE_STR[] = { "AUTO", "MAN", "IDLE", "ERR" };   /* theo thu tu system_mode_t */
+  char line1[17];
+  char line2[17];
+
+  lcd16x02_init();
+  lcd16x02_write_line(0U, "Smart Irrigation");
+  osDelay(800);
   /* Infinite loop */
   for(;;)
   {
-    osDelay(200);
+    if (osMutexWait(systemDataMutexHandle, osWaitForever) == osOK)
+    {
+      system_data_t s = g_system_data;
+      osMutexRelease(systemDataMutexHandle);           /* ghi LCD cham, khong giu mutex */
+
+      if (s.sensor_valid)
+      {
+        snprintf(line1, sizeof line1, "SOIL%3u%% SET%3u%%", s.soil_percent, s.setpoint_percent);
+      }
+      else
+      {
+        snprintf(line1, sizeof line1, "SOIL ERR SET%3u%%", s.setpoint_percent);
+      }
+      snprintf(line2, sizeof line2, "%-4s  PUMP:%-3s",
+               MODE_STR[s.mode], s.pump_on ? "ON" : "OFF");
+      lcd16x02_write_line(0U, line1);
+      lcd16x02_write_line(1U, line2);
+    }
+
+    osDelay(DISPLAY_PERIOD_MS);
   }
   /* USER CODE END StartdisplayTask */
 }
