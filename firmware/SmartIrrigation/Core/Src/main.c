@@ -25,6 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "relay_pump.h"
 
 /* USER CODE END Includes */
 
@@ -93,6 +94,7 @@ int main(void)
   MX_ADC1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  relay_pump_init(); /* PA4 is held high (pump off) before any task can run. */
 
   /* USER CODE END 2 */
 

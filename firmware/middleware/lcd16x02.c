@@ -1,69 +1,81 @@
 #include "lcd16x02.h"
-#include "stm32f1xx_hal.h"
+#include "main.h"
 
-#define RS GPIO_PIN_0
-#define EN GPIO_PIN_1
-#define D4 GPIO_PIN_10
-#define D5 GPIO_PIN_11
-#define D6 GPIO_PIN_12
-#define D7 GPIO_PIN_13
+#include <stddef.h>
 
-static void delay_us(uint32_t us)     /* DWT: HAL_Delay chi co do phan giai 1 ms */
+static void delay_us(uint32_t us)
 {
-    uint32_t start = DWT->CYCCNT, ticks = us * (SystemCoreClock / 1000000U);
-    while (DWT->CYCCNT - start < ticks) {}
+    uint32_t start = DWT->CYCCNT;
+    uint32_t ticks = us * (SystemCoreClock / 1000000U);
+    while ((uint32_t)(DWT->CYCCNT - start) < ticks) { }
 }
 
-static void pulse(void)
+static void pulse_enable(void)
 {
-    HAL_GPIO_WritePin(GPIOB, EN, GPIO_PIN_SET);   delay_us(2);
-    HAL_GPIO_WritePin(GPIOB, EN, GPIO_PIN_RESET); delay_us(50);
+    HAL_GPIO_WritePin(LCD_EN_GPIO_Port, LCD_EN_Pin, GPIO_PIN_SET);
+    delay_us(2U);
+    HAL_GPIO_WritePin(LCD_EN_GPIO_Port, LCD_EN_Pin, GPIO_PIN_RESET);
+    delay_us(50U);
 }
 
-static void write4(uint8_t n)
+static void write_nibble(uint8_t value)
 {
-    HAL_GPIO_WritePin(GPIOB, D4, (n & 1) ? GPIO_PIN_SET : GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(GPIOB, D5, (n & 2) ? GPIO_PIN_SET : GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(GPIOB, D6, (n & 4) ? GPIO_PIN_SET : GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(GPIOB, D7, (n & 8) ? GPIO_PIN_SET : GPIO_PIN_RESET);
-    pulse();
+    HAL_GPIO_WritePin(LCD_D4_GPIO_Port, LCD_D4_Pin,
+                      (value & 0x01U) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(LCD_D5_GPIO_Port, LCD_D5_Pin,
+                      (value & 0x02U) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(LCD_D6_GPIO_Port, LCD_D6_Pin,
+                      (value & 0x04U) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(LCD_D7_GPIO_Port, LCD_D7_Pin,
+                      (value & 0x08U) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    pulse_enable();
 }
 
-static void write8(uint8_t v, int rs)
+static void write_byte(uint8_t value, GPIO_PinState rs)
 {
-    HAL_GPIO_WritePin(GPIOB, RS, rs ? GPIO_PIN_SET : GPIO_PIN_RESET);
-    write4(v >> 4);
-    write4(v & 0x0F);
+    HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, rs);
+    write_nibble((uint8_t)(value >> 4));
+    write_nibble((uint8_t)(value & 0x0FU));
 }
 
-void lcd_init(void)
+void lcd16x02_init(void)
 {
+    /* CubeMX already configured the LCD GPIOs; only enable the Cortex DWT timer. */
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-    DWT->CYCCNT = 0;
+    DWT->CYCCNT = 0U;
     DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 
-    __HAL_RCC_GPIOB_CLK_ENABLE();
-    GPIO_InitTypeDef g = {.Pin = RS | EN | D4 | D5 | D6 | D7,
-                          .Mode = GPIO_MODE_OUTPUT_PP, .Speed = GPIO_SPEED_FREQ_LOW};
-    HAL_GPIO_Init(GPIOB, &g);
-
-    HAL_Delay(50);
-    HAL_GPIO_WritePin(GPIOB, RS, GPIO_PIN_RESET);
-    write4(0x3); HAL_Delay(5);
-    write4(0x3); delay_us(200);
-    write4(0x3); delay_us(200);
-    write4(0x2);                     /* chuyen sang 4-bit */
-    write8(0x28, 0);                 /* 4-bit, 2 dong, 5x8 */
-    write8(0x0C, 0);                 /* display ON, khong con tro */
-    write8(0x06, 0);                 /* tang dia chi */
-    lcd_clear();
+    HAL_Delay(50U);
+    HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_RESET);
+    write_nibble(0x03U);
+    HAL_Delay(5U);
+    write_nibble(0x03U);
+    delay_us(200U);
+    write_nibble(0x03U);
+    delay_us(200U);
+    write_nibble(0x02U);
+    write_byte(0x28U, GPIO_PIN_RESET); /* 4-bit, two lines, 5x8 font */
+    write_byte(0x0CU, GPIO_PIN_RESET); /* display on, cursor off */
+    write_byte(0x06U, GPIO_PIN_RESET); /* increment address */
+    write_byte(0x01U, GPIO_PIN_RESET);
+    HAL_Delay(2U);
 }
 
-void lcd_clear(void) { write8(0x01, 0); HAL_Delay(2); }
-
-void lcd_print_line(unsigned row, const char *s)
+void lcd16x02_write_line(uint8_t row, const char *text)
 {
-    write8(0x80 | (row ? 0x40 : 0x00), 0);
-    for (int i = 0; i < 16; i++)
-        write8(*s ? (uint8_t)*s++ : ' ', 1);
+    if (row > 1U)
+    {
+        return;
+    }
+
+    write_byte((uint8_t)(0x80U | ((row == 0U) ? 0x00U : 0x40U)), GPIO_PIN_RESET);
+    for (uint8_t column = 0U; column < 16U; column++)
+    {
+        char ch = (text != NULL) ? text[column] : '\0';
+        write_byte((uint8_t)((ch != '\0') ? ch : ' '), GPIO_PIN_SET);
+        if (ch == '\0' && text != NULL)
+        {
+            text = NULL; /* pad the rest without reading past the terminator */
+        }
+    }
 }

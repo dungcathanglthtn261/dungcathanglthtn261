@@ -26,12 +26,11 @@ void uart_comm_send_status(const system_data_t *data)
     int length = snprintf(
         tx_buffer,
         sizeof(tx_buffer),
-        "SOIL: %u%% | SET: %u%% | MODE: %s | PUMP: %s | VALID: %u\r\n",
+        "SOIL: %u%% | SET: %u%% | MODE: %s | PUMP: %s\r\n",
         (unsigned int)data->soil_percent,
         (unsigned int)data->setpoint_percent,
         data->mode == MODE_AUTO ? "AUTO" : "MANUAL",
-        data->pump_on ? "ON" : "OFF",
-        data->sensor_valid ? 1U : 0U
+        data->pump_on ? "ON" : "OFF"
     );
 
     if ((length <= 0) || ((size_t)length >= sizeof(tx_buffer)))
@@ -55,8 +54,17 @@ void uart_comm_send_status(const system_data_t *data)
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-    if (huart->Instance == USART2)
+    if ((huart != NULL) && (huart->Instance == USART2))
     {
+        tx_busy = false;
+    }
+}
+
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+    if ((huart != NULL) && (huart->Instance == USART2))
+    {
+        /* Release our static TX buffer after a HAL transfer error. */
         tx_busy = false;
     }
 }
