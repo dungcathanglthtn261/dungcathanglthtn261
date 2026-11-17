@@ -4,8 +4,8 @@
 |---|---|
 | `firmware/SmartIrrigation/Core/Src/` | Phần của Dũng: `irrigation_control.c`, thân các task trong `freertos.c` |
 | `firmware/SmartIrrigation/*.resc, *.repl, Makefile` | Build bằng `make` và mô phỏng trên Renode (xem phần bên dưới) |
-| `simulation/` | `sketch.ino` – bản Arduino để chạy trên Wokwi / Mokxi |
-| `hardware/` | KiCad: schematic, PCB, thư viện footprint/symbol |
+| `simulation/mokxi/` | `sketch.ino` – bản Arduino để chạy trên Wokwi / Mokxi |
+| `hardware/kicad/` | KiCad: schematic, PCB, thư viện footprint/symbol |
 | `hardware/images/` | Ảnh preview PCB |
 | `hardware/routing/` | File Freerouting (.dsn/.ses) và kết quả DRC |
 | `docs/block-diagram/` | Sơ đồ khối hệ thống (draw.io, PNG, Visio) |
@@ -14,11 +14,9 @@
 
 ## Phân chia với nhánh `Ca`
 
-Nhánh này **chỉ chứa phần của Dũng**. Khung CubeMX (`main.c`, `gpio`, `adc`, `usart`, `.mxproject`…), HAL, FreeRTOS, các header trong `Core/Inc`, `button.c` (chống dội), `uart_comm.c` là của Ca, nằm ở nhánh [`Ca`](../../tree/Ca), cùng đường dẫn `firmware/SmartIrrigation/`.
+Nhánh này **chỉ chứa phần của Dũng**, đặt cùng đường dẫn với nhánh [`Ca`](../../tree/Ca) để gộp không bị lệch thư mục. Khung CubeMX (`main.c`, `gpio`, `adc`, `usart`, `.mxproject`…), HAL, FreeRTOS, các header trong `Core/Inc`, `button.c` (chống dội), `uart_comm.c` nằm ở `firmware/SmartIrrigation/` của Ca. Driver `lcd16x02`, `soil_sensor`, `relay_pump` nằm ở `firmware/middleware/` của Ca.
 
-- `make ca` tải phần của Ca từ `origin/Ca` về `.ca/` (không commit).
-- **`lcd16x02.c`, `soil_sensor.c`, `relay_pump.c` hiện không có trong nhánh này** (đã xóa ở commit `df55ced`), nhánh `Ca` cũng chỉ có header. Cho tới khi có lại 3 file này, `make` sẽ lỗi ở bước link. Bản cũ lấy lại được bằng:
-  `git checkout 2958e75 -- firmware/SmartIrrigation/Core/Src/{lcd16x02,soil_sensor,relay_pump}.c`
+- `make ca` tải toàn bộ thư mục `firmware/` của `origin/Ca` về `.ca/` (không commit).
 - Khi build, file ở nhánh này được ưu tiên hơn file cùng tên của Ca: `freertos.c`, `SmartIrrigation.ioc` (stack `displayTask` 384 word cho `snprintf`).
 - Sau khi gộp hai nhánh, `Makefile` tự dùng code tại chỗ, không cần `.ca/` nữa.
 

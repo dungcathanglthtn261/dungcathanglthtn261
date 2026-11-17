@@ -4,7 +4,7 @@
 **Môn:** Lập trình Hệ thống nhúng, HK261
 **Ngày chạy mô phỏng:** 17/11/2026
 
-> **Lưu ý:** kết quả trong báo cáo này đo trên commit `2958e75` của nhánh `Dung`. Từ commit `df55ced`, nhánh `Dung` không còn `lcd16x02.c`, `soil_sensor.c`, `relay_pump.c`, nên muốn chạy lại phải có lại 3 file này (xem README).
+> **Lưu ý:** kết quả trong báo cáo này đo trên commit `2958e75` của nhánh `Dung`. Nay 3 driver `lcd16x02`, `soil_sensor`, `relay_pump` lấy từ `firmware/middleware/` của nhánh `Ca` (`make ca`); bộ test chạy lại trên Ca `6bcdbb6` vẫn đạt cả 3 tình huống.
 
 ---
 

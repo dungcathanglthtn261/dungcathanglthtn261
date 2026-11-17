@@ -13,13 +13,15 @@
 ######################################
 # target
 ######################################
-# Nhanh Dung chi chua phan cua Dung (lcd16x02, soil_sensor, relay_pump, task trong freertos.c).
-# Khung CubeMX, HAL, FreeRTOS, button, uart_comm la cua Ca: lay tu nhanh Ca ve .ca/ (khong commit).
+# Cau truc giong nhanh Ca: firmware/SmartIrrigation (CubeMX) + firmware/middleware (driver).
+# Nhanh Dung chi chua irrigation_control.c, freertos.c, .ioc; phan con lai lay tu nhanh Ca
+# ve .ca/ (= ban sao thu muc firmware/ cua Ca, khong commit).
 #   make ca   -> tai/cap nhat phan cua Ca
 #   make      -> build; file o day uu tien hon file cung ten cua Ca
 # Sau khi gop 2 nhanh (co Core/Src/main.c tai cho) thi dung thang thu muc nay.
 CA_SNAPSHOT = ../../.ca
-CA_DIR ?= $(if $(wildcard Core/Src/main.c),.,$(CA_SNAPSHOT))
+CA_DIR ?= $(if $(wildcard Core/Src/main.c),.,$(CA_SNAPSHOT)/SmartIrrigation)
+MW_DIR = $(CA_DIR)/../middleware
 
 ifeq ($(filter ca clean,$(MAKECMDGOALS)),)
 ifeq ($(wildcard $(CA_DIR)/Core/Src/main.c),)
@@ -55,10 +57,7 @@ Core/Src/button.c \
 Core/Src/freertos.c \
 Core/Src/gpio.c \
 Core/Src/irrigation_control.c \
-Core/Src/lcd16x02.c \
 Core/Src/main.c \
-Core/Src/relay_pump.c \
-Core/Src/soil_sensor.c \
 Core/Src/stm32f1xx_hal_msp.c \
 Core/Src/stm32f1xx_hal_timebase_tim.c \
 Core/Src/stm32f1xx_it.c \
@@ -159,7 +158,7 @@ Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 \
 Drivers/CMSIS/Device/ST/STM32F1xx/Include \
 Drivers/CMSIS/Include
 AS_INCLUDES = $(foreach d,$(INC_DIRS),-I$(d) -I$(CA_DIR)/$(d))
-C_INCLUDES = $(AS_INCLUDES)
+C_INCLUDES = $(AS_INCLUDES) -I../middleware -I$(MW_DIR)
 
 
 # compile gcc flags
@@ -196,7 +195,10 @@ all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET
 #######################################
 # list of objects
 OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
-vpath %.c $(sort $(dir $(C_SOURCES))) $(addprefix $(CA_DIR)/,$(sort $(dir $(C_SOURCES))))
+# Driver lcd16x02/relay_pump/soil_sensor nam o firmware/middleware (nhu nhanh Ca)
+MW_SOURCES = lcd16x02.c relay_pump.c soil_sensor.c
+OBJECTS += $(addprefix $(BUILD_DIR)/,$(MW_SOURCES:.c=.o))
+vpath %.c $(sort $(dir $(C_SOURCES))) $(addprefix $(CA_DIR)/,$(sort $(dir $(C_SOURCES)))) ../middleware $(MW_DIR)
 # list of ASM program objects
 OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(ASM_SOURCES:.s=.o)))
 vpath %.s $(addprefix $(CA_DIR)/,$(sort $(dir $(ASM_SOURCES))))
@@ -242,7 +244,7 @@ clean:
 ca:
 	git fetch origin Ca
 	rm -rf $(CA_SNAPSHOT) && mkdir -p $(CA_SNAPSHOT)
-	git -C ../.. archive FETCH_HEAD:firmware/SmartIrrigation | tar -x -C $(CA_SNAPSHOT)
+	git -C ../.. archive FETCH_HEAD:firmware | tar -x -C $(CA_SNAPSHOT)
 	@git log -1 --format='Da lay nhanh Ca: %h %s' FETCH_HEAD
 
 .PHONY: ca
