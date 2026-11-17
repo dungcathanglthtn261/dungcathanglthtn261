@@ -17,7 +17,11 @@
 Nhánh này **chỉ chứa phần của Dũng**, đặt cùng đường dẫn với nhánh [`Ca`](../../tree/Ca) để gộp không bị lệch thư mục. Khung CubeMX (`main.c`, `gpio`, `adc`, `usart`, `.mxproject`…), HAL, FreeRTOS, các header trong `Core/Inc`, `button.c` (chống dội), `uart_comm.c` nằm ở `firmware/SmartIrrigation/` của Ca. Driver `lcd16x02`, `soil_sensor`, `relay_pump` nằm ở `firmware/middleware/` của Ca.
 
 - `make ca` tải toàn bộ thư mục `firmware/` của `origin/Ca` về `.ca/` (không commit).
-- Khi build, file ở nhánh này được ưu tiên hơn file cùng tên của Ca: `freertos.c`, `SmartIrrigation.ioc` (stack `displayTask` 384 word cho `snprintf`).
+- Khi build, file ở nhánh này được ưu tiên hơn file cùng tên của Ca: `freertos.c`, `SmartIrrigation.ioc` (stack `displayTask` 384 word, priority các task). Ngoài ra có 3 file của Ca đã sửa (GĐ3), cần thống nhất với Ca khi gộp:
+  - `Core/Inc/app_types.h`: thêm `MODE_IDLE`, `MODE_ERROR` (thêm vào cuối enum, `MODE_AUTO` vẫn = 0).
+  - `Core/Src/uart_comm.c`: nhận lệnh 1 ký tự (`m` = MODE, `p` = PUMP, `+`/`-` = setpoint), in đủ 4 trạng thái, nhận lại sau lỗi UART.
+  - `firmware/middleware/soil_sensor.c`: ADC ngoài `[WET − 300, DRY + 300]` → báo cảm biến lỗi.
+- `make ca` xóa trong `.ca/` các header mà nhánh này có bản riêng (do `#include "..."` tìm cùng thư mục trước). Thêm header local mới thì chạy lại `make ca`.
 - Sau khi gộp hai nhánh, `Makefile` tự dùng code tại chỗ, không cần `.ca/` nữa.
 
 ## Mô phỏng FreeRTOS trên Renode
@@ -115,7 +119,7 @@ cd firmware/SmartIrrigation
 renode --console --disable-gui -e "include @test_irrigation.resc"
 ```
 
-Script tự chạy 3 tình huống (đất khô → bơm ON, đất ướt → bơm OFF, MODE + PUMP → MANUAL/ON) và in trạng thái relay. Chạy lại sau mỗi lần sửa code và `make`.
+Script tự chạy 13 bước T1–T13: IDLE → AUTO, đất khô/ướt, hysteresis ±5% quanh setpoint 60% (50% ON, 60% giữ ON, 70% OFF, 60% giữ OFF), cảm biến lỗi → ERROR → tự về AUTO, nút MODE/PUMP, lệnh UART `m`/`p`. Mỗi bước in dòng `=== Tn ... expect True/False` rồi trạng thái relay (`True` = bơm ON). Chạy lại sau mỗi lần sửa code và `make`.
 
 ### 8. Debug bằng GDB (tuỳ chọn)
 

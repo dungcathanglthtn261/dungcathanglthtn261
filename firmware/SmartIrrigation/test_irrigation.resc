@@ -1,4 +1,5 @@
 # Kiem thu tu dong: renode --console --disable-gui -e "include @test_irrigation.resc"
+# relay State: True = bom ON. ADC raw -> %: (raw-3164)*100/(1576-3164). SET 60, H 5.
 mach create "irrigation"
 machine LoadPlatformDescription @irrigation.repl
 sysbus LoadELF @build/Project.elf
@@ -7,15 +8,47 @@ logLevel 3
 logLevel -1 sysbus.gpioPortA.relay
 logLevel 0 sysbus.usart2
 showAnalyzer sysbus.usart2 Antmicro.Renode.Analyzers.LoggingUartAnalyzer
+
 emulation RunFor "2.5"
-echo "=== dry (raw 2500): relay"
+echo "=== T1 dry (raw 2500 = 41%), IDLE -> AUTO -> ON; expect True"
 sysbus.gpioPortA.relay State
 sysbus ReadByte `sysbus GetSymbolAddress "g_system_data"`
 sysbus WriteDoubleWord 0x400127FC 1300
 emulation RunFor "1.5"
-echo "=== wet (raw 1300): relay"
+echo "=== T2 wet (raw 1300 = 100%) -> OFF; expect False"
 sysbus.gpioPortA.relay State
 sysbus ReadByte `sysbus GetSymbolAddress "g_system_data"`
+
+# Hysteresis: 50% ON, 60% giu ON, 70% OFF, 60% giu OFF
+sysbus WriteDoubleWord 0x400127FC 2370
+emulation RunFor "1.5"
+echo "=== T3 hysteresis 50% -> ON; expect True"
+sysbus.gpioPortA.relay State
+sysbus WriteDoubleWord 0x400127FC 2211
+emulation RunFor "1.5"
+echo "=== T4 hysteresis 60% (dang ON) -> giu ON; expect True"
+sysbus.gpioPortA.relay State
+sysbus WriteDoubleWord 0x400127FC 2052
+emulation RunFor "1.5"
+echo "=== T5 hysteresis 70% -> OFF; expect False"
+sysbus.gpioPortA.relay State
+sysbus WriteDoubleWord 0x400127FC 2211
+emulation RunFor "1.5"
+echo "=== T6 hysteresis 60% (dang OFF) -> giu OFF; expect False"
+sysbus.gpioPortA.relay State
+
+# ERROR: raw 4000 ngoai [WET-300, DRY+300] -> cam bien loi
+sysbus WriteDoubleWord 0x400127FC 2370
+emulation RunFor "1.5"
+sysbus WriteDoubleWord 0x400127FC 4000
+emulation RunFor "1.5"
+echo "=== T7 sensor loi (raw 4000) -> ERROR, tat bom; expect False, usart2 MODE: ERROR"
+sysbus.gpioPortA.relay State
+sysbus WriteDoubleWord 0x400127FC 2370
+emulation RunFor "1.5"
+echo "=== T8 sensor binh thuong lai (50%) -> AUTO, ON; expect True"
+sysbus.gpioPortA.relay State
+
 # Nut keo len: chan o muc cao = nha; ha xuong thap = nhan (MODE=PB5, PUMP=PB8)
 sysbus.gpioPortB OnGPIO 5 true
 sysbus.gpioPortB OnGPIO 8 true
@@ -23,11 +56,27 @@ emulation RunFor "0.2"
 sysbus.gpioPortB OnGPIO 5 false
 emulation RunFor "0.2"
 sysbus.gpioPortB OnGPIO 5 true
+emulation RunFor "0.2"
+echo "=== T9 nut MODE -> MANUAL, bom tat; expect False"
+sysbus.gpioPortA.relay State
 sysbus.gpioPortB OnGPIO 8 false
 emulation RunFor "0.2"
 sysbus.gpioPortB OnGPIO 8 true
-emulation RunFor "0.2"
-emulation RunFor "1"
-echo "=== MODE roi PUMP: dong usart2 cuoi phai la MODE: MANUAL | PUMP: ON; relay:"
+emulation RunFor "1.2"
+echo "=== T10 nut PUMP -> MANUAL ON; expect True, usart2 MODE: MANUAL | PUMP: ON"
+sysbus.gpioPortA.relay State
+
+# Lenh UART: m = MODE, p = PUMP
+sysbus.usart2 WriteChar 0x6D
+emulation RunFor "1.2"
+echo "=== T11 UART 'm' -> AUTO (50% -> ON); expect True, usart2 MODE: AUTO"
+sysbus.gpioPortA.relay State
+sysbus.usart2 WriteChar 0x6D
+emulation RunFor "0.3"
+echo "=== T12 UART 'm' -> MANUAL, bom tat; expect False"
+sysbus.gpioPortA.relay State
+sysbus.usart2 WriteChar 0x70
+emulation RunFor "1.2"
+echo "=== T13 UART 'p' -> MANUAL ON; expect True, usart2 MODE: MANUAL | PUMP: ON"
 sysbus.gpioPortA.relay State
 quit

@@ -27,6 +27,11 @@ ifeq ($(filter ca clean,$(MAKECMDGOALS)),)
 ifeq ($(wildcard $(CA_DIR)/Core/Src/main.c),)
 $(error Chua co phan cua Ca. Chay: make ca)
 endif
+ifneq ($(CA_DIR),.)
+ifneq ($(wildcard $(addprefix $(CA_DIR)/,$(wildcard Core/Inc/*.h))),)
+$(error Header local che header cua Ca trong .ca/. Chay: make ca)
+endif
+endif
 endif
 
 TARGET = Project
@@ -245,6 +250,8 @@ ca:
 	git fetch origin Ca
 	rm -rf $(CA_SNAPSHOT) && mkdir -p $(CA_SNAPSHOT)
 	git -C ../.. archive FETCH_HEAD:firmware | tar -x -C $(CA_SNAPSHOT)
+	@# #include "x.h" tim cung thu muc truoc -I, nen xoa header Ca ma Dung da co ban rieng
+	rm -f $(addprefix $(CA_SNAPSHOT)/SmartIrrigation/,$(wildcard Core/Inc/*.h)) $(addprefix $(CA_SNAPSHOT)/,$(patsubst ../%,%,$(wildcard ../middleware/*.h)))
 	@git log -1 --format='Da lay nhanh Ca: %h %s' FETCH_HEAD
 
 .PHONY: ca

@@ -54,6 +54,8 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 volatile uint32_t g_button_press_count[BUTTON_COUNT] = {0U};
+/* Lenh UART = nut ao; chi ISR UART (uart_comm.c) ghi, tach rieng de khong tranh ghi voi task Button. */
+volatile uint32_t g_uart_press_count[BUTTON_COUNT] = {0U};
 system_data_t g_system_data =
 {
     .soil_percent = 0U,
@@ -139,15 +141,15 @@ void MX_FREERTOS_Init(void) {
   sensorTaskHandle = osThreadCreate(osThread(sensorTask), NULL);
 
   /* definition and creation of controlTask */
-  osThreadDef(controlTask, StartcontrolTask, osPriorityNormal, 0, 128);
+  osThreadDef(controlTask, StartcontrolTask, osPriorityAboveNormal, 0, 128);
   controlTaskHandle = osThreadCreate(osThread(controlTask), NULL);
 
   /* definition and creation of displayTask */
-  osThreadDef(displayTask, StartdisplayTask, osPriorityNormal, 0, 384);
+  osThreadDef(displayTask, StartdisplayTask, osPriorityBelowNormal, 0, 384);
   displayTaskHandle = osThreadCreate(osThread(displayTask), NULL);
 
   /* definition and creation of uartTask */
-  osThreadDef(uartTask, StartuartTask, osPriorityNormal, 0, 384);
+  osThreadDef(uartTask, StartuartTask, osPriorityBelowNormal, 0, 384);
   uartTaskHandle = osThreadCreate(osThread(uartTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -225,6 +227,7 @@ void StartcontrolTask(void const * argument)
 {
   /* USER CODE BEGIN StartcontrolTask */
   uint32_t handled[BUTTON_COUNT] = {0U};
+  uint32_t handled_uart[BUTTON_COUNT] = {0U};
 
   if (osMutexWait(systemDataMutexHandle, osWaitForever) == osOK)
   {
@@ -242,6 +245,11 @@ void StartcontrolTask(void const * argument)
         while (handled[i] != g_button_press_count[i])
         {
           handled[i]++;
+          irrigation_control_handle_button(&g_system_data, (button_id_t)i);
+        }
+        while (handled_uart[i] != g_uart_press_count[i])
+        {
+          handled_uart[i]++;
           irrigation_control_handle_button(&g_system_data, (button_id_t)i);
         }
       }
@@ -264,6 +272,7 @@ void StartcontrolTask(void const * argument)
 void StartdisplayTask(void const * argument)
 {
   /* USER CODE BEGIN StartdisplayTask */
+  static const char *const MODE_STR[] = { "AUTO", "MAN", "IDLE", "ERR" };   /* theo thu tu system_mode_t */
   char line1[17];
   char line2[17];
 
@@ -287,7 +296,7 @@ void StartdisplayTask(void const * argument)
         snprintf(line1, sizeof line1, "SOIL ERR SET%3u%%", s.setpoint_percent);
       }
       snprintf(line2, sizeof line2, "%-4s  PUMP:%-3s",
-               (s.mode == MODE_AUTO) ? "AUTO" : "MAN", s.pump_on ? "ON" : "OFF");
+               MODE_STR[s.mode], s.pump_on ? "ON" : "OFF");
       lcd16x02_write_line(0U, line1);
       lcd16x02_write_line(1U, line2);
     }

@@ -1,26 +1,41 @@
 flowchart TD
-  A([Task_Control<br/>chu kỳ 100 ms]) --> A1[Khởi tạo relay: bơm OFF]
+  A([Task_Control<br/>priority AboveNormal, chu kỳ 100 ms]) --> A1[Khởi tạo relay<br/>trạng thái = IDLE, bơm OFF]
   A1 --> B[Khóa mutex]
-  B --> P{Còn lần nhấn nút<br/>chưa xử lý?}
-  P -- Có --> Q{Nút nào?}
-  Q -- MODE --> Q1[Đổi AUTO ↔ MANUAL<br/>bơm giữ nguyên trạng thái] --> P
+  B --> P{Còn lần nhấn nút / lệnh UART<br/>chưa xử lý?}
+  P -- Có --> Q{Nút nào?<br/>UART: m=MODE p=PUMP + - }
+  Q -- MODE --> Q1{Đang MANUAL?}
+  Q1 -- Có --> Q1a[Vào AUTO, bơm OFF] --> P
+  Q1 -- Không --> Q1b[Vào MANUAL, bơm OFF] --> P
   Q -- UP --> Q2{Setpoint + 5 ≤ 90?}
   Q2 -- Có --> Q3[Setpoint + 5] --> P
   Q2 -- Không --> P
   Q -- DOWN --> Q4{Setpoint − 5 ≥ 10?}
   Q4 -- Có --> Q5[Setpoint − 5] --> P
   Q4 -- Không --> P
-  Q -- PUMP --> Q6{Mode = MANUAL?}
+  Q -- PUMP --> Q6{Đang MANUAL?}
   Q6 -- Có --> Q7[Đảo trạng thái bơm] --> P
   Q6 -- Không --> P
-  P -- Không --> C{Mode = AUTO?}
-  C -- Không: MANUAL --> G[Giữ trạng thái bơm<br/>do nút PUMP quyết định]
-  C -- Có --> D{sensor_valid và<br/>soil &lt; setpoint?}
-  D -- Có --> E[Bơm ON]
-  D -- Không --> F[Bơm OFF]
-  E --> R[Xuất relay:<br/>ON → IN = LOW, OFF → IN = HIGH]
+  P -- Không --> S{Trạng thái?}
+  S -- IDLE --> I1{sensor_valid?}
+  I1 -- Có --> I2[Vào AUTO, bơm OFF]
+  I1 -- Không --> R
+  S -- ERROR --> E1{sensor_valid?}
+  E1 -- Có --> I2
+  E1 -- Không --> R
+  S -- MANUAL --> G[Giữ trạng thái bơm<br/>do nút PUMP quyết định]
+  S -- AUTO --> D0{sensor_valid?}
+  D0 -- Không --> E2[Vào ERROR, bơm OFF]
+  D0 -- Có --> D1{soil &lt; setpoint − 5?}
+  D1 -- Có --> E[Bơm ON]
+  D1 -- Không --> D2{soil ≥ setpoint + 5?}
+  D2 -- Có --> F[Bơm OFF]
+  D2 -- Không --> K[Giữ nguyên<br/>hysteresis]
+  I2 --> R
+  E2 --> R
+  E --> R
   F --> R
+  K --> R
   G --> R
-  R --> H[Mở mutex]
-  H --> I[osDelay 100 ms]
-  I --> B
+  R[Xuất relay:<br/>ON → IN = LOW, OFF → IN = HIGH] --> H[Mở mutex]
+  H --> W[osDelay 100 ms]
+  W --> B
