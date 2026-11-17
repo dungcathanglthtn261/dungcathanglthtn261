@@ -19,7 +19,6 @@ Nhóm: Dũng · Ca · Thắng
 ## Cấu trúc repo
 
 ```
-docs/block-diagram/  Sơ đồ khối
 hardware/kicad/      Project KiCad: schematic, PCB 10x10 cm, thư viện symbol/footprint riêng
 hardware/images/     Ảnh xem nhanh schematic và PCB
 firmware/SmartIrrigation/  Project STM32CubeIDE + FreeRTOS (5 task, Task_Control, driver soil_sensor/lcd16x02/relay_pump), Makefile, mô phỏng Renode (*.repl, *.resc)
