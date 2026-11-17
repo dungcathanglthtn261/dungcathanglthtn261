@@ -83,10 +83,10 @@ make
 renode -e "i @irrigation.resc"
 ```
 
-- Dùng `-e "i @irrigation.resc"`, **không** dùng `renode irrigation.resc`. Đường dẫn có dấu cách (`Lap trinh He thong nhung`) làm Renode báo `Could not tokenize`.
+- Dùng `-e "i @irrigation.resc"`, **không** dùng `renode irrigation.resc`. Nếu đường dẫn có dấu cách (vd `Lap trinh He thong nhung`), cách sau làm Renode báo `Could not tokenize`.
 - Phải chạy lệnh `renode` khi đang đứng trong `firmware/SmartIrrigation/`.
-- Mở đúng: dấu nhắc là `(irrigation)` và có cửa sổ **usart2** in mỗi giây một dòng:
-  `SOIL: 41% | SET: 60% | MODE: AUTO | PUMP: ON | VALID: 1`
+- Mở đúng: dấu nhắc là `(irrigation)` và có cửa sổ **usart2** in mỗi giây một dòng. Dòng đầu là `MODE: IDLE`, sau khoảng 1 s chuyển sang AUTO:
+  `SOIL: 41% | SET: 60% | MODE: AUTO | PUMP: ON`
 - `make: Nothing to be done for 'all'` không phải lỗi: bản build đã mới nhất.
 
 #### 2. Thả 4 nút (làm một lần, ngay sau khi mở)
@@ -108,12 +108,14 @@ sysbus WriteDoubleWord 0x400127FC <giá trị ADC>
 
 | ADC | Độ ẩm |
 |---|---|
-| ≥ 3164 | 0% (khô) |
+| > 3464 | cảm biến lỗi → `ERROR` (hở mạch) |
+| 3164 | 0% (khô) |
 | 2690 | ~29% |
 | 2500 | ~41% (mặc định lúc mở) |
 | 2370 | ~50% |
 | 2050 | ~70% |
-| ≤ 1576 | 100% (ướt) |
+| 1576 | 100% (ướt) |
+| < 1276 | cảm biến lỗi → `ERROR` (chập) |
 
 Cảm biến được đọc mỗi 1 s, nên đợi 1–2 s để usart2 cập nhật.
 
