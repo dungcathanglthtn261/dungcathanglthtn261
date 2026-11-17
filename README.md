@@ -22,7 +22,6 @@ Nhóm: Dũng · Ca · Thắng
 hardware/kicad/      Project KiCad: schematic, PCB 10x10 cm, thư viện symbol/footprint riêng
 hardware/images/     Ảnh xem nhanh schematic và PCB
 firmware/SmartIrrigation/  Project STM32CubeIDE + FreeRTOS (5 task, Task_Control, driver soil_sensor/lcd16x02/relay_pump), Makefile, mô phỏng Renode (*.repl, *.resc)
-firmware/app/        Bản phác thảo firmware ban đầu (trước CubeMX)
 hardware/routing/    File Freerouting (.dsn/.ses) và kết quả DRC
 docs/bao-cao-mo-phong-renode.md  Báo cáo mô phỏng Renode
 simulation/mokxi/    diagram.json (định dạng Wokwi) + sketch.ino để mô phỏng trên Mokxi/Wokwi

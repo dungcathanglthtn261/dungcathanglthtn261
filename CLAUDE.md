@@ -9,7 +9,6 @@ Smart irrigation controller on an STM32F103C8 (Blue Pill): STM32CubeMX HAL + Fre
 - `main` is the integrated tree: Ca's CubeMX/CubeIDE skeleton, HAL, FreeRTOS, `button.c`, the drivers (`soil_sensor`, `lcd16x02`, `relay_pump` in `Core/Src`+`Core/Inc`), plus Dung's GĐ3 work (Task_Control/state machine, task bodies, Renode model and tests). It was merged via PR #1 as a merge commit. Keep using merge commits rather than squash, so each member's history stays visible.
 - Start new work on a branch off `main`. **Do not merge the old `Dung` branch (or anything based on it) again.** Its history deletes Ca's files ("Keep only Dung's work"), so a plain merge silently deletes ~12 files (docs .xlsx/.pdf/.docx, `firmware/app/`, Mokxi files) without any conflict, and also replaces `README.md`. After any merge, check `git diff --name-only --diff-filter=D <base> HEAD` is empty.
 - Ownership: Ca owns the CubeMX-generated code, `button.c`, `uart_comm.c`, `app_types.h`/`app_config.h` and the drivers. Dung owns `irrigation_control.c`, the task bodies in `freertos.c`, the `Makefile` and the Renode files. GĐ3 changed `app_types.h`, `uart_comm.c` and `soil_sensor.c`. Coordinate before changing Ca's files.
-- `firmware/app/` is the earlier pre-CubeMX firmware draft and is not built.
 
 ## Commands
 
